@@ -1,0 +1,34 @@
+/* Recommendations: an orange-toned panel; every recommendation is a glass card built like the KPI cards (label, icon chip, headline, detail). */
+.kpi-c6{--kc:#FF5200}
+.kpi-c7{--kc:var(--loss)} /* red: high priority */
+.rec-box{background:linear-gradient(150deg,color-mix(in srgb,var(--brand) 26%,var(--salt)) 0%,color-mix(in srgb,var(--brand) 9%,var(--salt)) 100%);
+  border:1px solid color-mix(in srgb,var(--brand) 34%,transparent)}
+.rec-box>h3{font-size:16px;font-weight:800}
+/* On its own row the box has no card behind it: the recommendation cards sit straight on the page. */
+.rec-open{background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;padding:0;overflow:visible}
+.rec-open::before,.rec-open::after{display:none}
+.rec-open>h3{margin-bottom:12px}
+.rec-kcard{padding:14px 16px}
+.rec-kcard .label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.rec-kcard .val{font-size:16.5px;line-height:1.3;margin-top:6px;letter-spacing:0;font-weight:800}
+.rec-kcard .delta{font-size:13px;line-height:1.5;margin-top:6px;font-weight:500}
+.rec-kcard .kpi-ico{width:32px;height:32px;border-radius:10px}
+.rec-kcard .kpi-ico svg{width:18px;height:18px}
+.rec-em{color:var(--ink);font-weight:700}
+.rec-impact{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:4px 10px;font-size:13px;font-weight:700;
+  background:color-mix(in srgb,var(--kc) 16%,transparent);color:color-mix(in srgb,var(--kc) 65%,var(--ink))}
+.rec-chip{display:inline-block;color:var(--brand);background:var(--surface);border:1px solid color-mix(in srgb,var(--brand) 38%,transparent);
+  border-radius:8px;padding:1px 9px;font-size:12.5px;font-weight:800;text-decoration:none}
+.rec-chip:hover{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.rec-from,.rec-to{border-radius:var(--r-sm);padding:6px 10px;font-weight:800;text-align:left;min-width:0}
+.rec-from{background:var(--surface);color:var(--brand);border:1px solid color-mix(in srgb,var(--brand) 42%,transparent)}
+.rec-to{background:#DCE9FB;color:#1A5FD0;border:1px solid #A9C6F0}
+.rec-from small,.rec-to small{display:block;font-size:12px;font-weight:600;color:var(--muted)}
+.rec-arrow{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:999px;color:var(--brand-ink);background:var(--cool)}
+.rec-section{margin:0 0 8px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:color-mix(in srgb,var(--brand) 72%,var(--ink))}
+.rec-verdict{margin:0 0 12px;font-size:14.5px;font-weight:600;line-height:1.5;border-left:4px solid var(--brand);padding-left:10px}
+.rec-row{background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid color-mix(in srgb,var(--brand) 25%,transparent);border-radius:var(--r-sm)}
+.rec-row:hover{background:var(--surface);border-color:var(--brand)}
+.rec-icon-btn{display:grid;place-items:center;width:28px;height:28px;border-radius:999px;color:var(--muted)}
+.rec-icon-btn:hover:not(:disabled){background:color-mix(in srgb,var(--brand) 16%,transparent);color:var(--brand)}
+.rec-icon-btn:disabled{opacity:.5}

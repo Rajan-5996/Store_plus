@@ -1,4 +1,6 @@
 import {
+  RiArrowLeftRightFill,
+  RiArrowLeftRightLine,
   RiBox3Fill,
   RiBox3Line,
   RiDashboard3Fill,
@@ -32,4 +34,5 @@ export const solutionNav: NavItem[] = [
   { path: 'profitability', label: 'Store profitability', icon: RiMoneyRupeeCircleLine, activeIcon: RiMoneyRupeeCircleFill },
   { path: 'network', label: 'Network optimisation', icon: RiMapPin2Line, activeIcon: RiMapPin2Fill },
   { path: 'productmix', label: 'Product mix', icon: RiStackLine, activeIcon: RiStackFill },
+  { path: 'transfers', label: 'Transfer log', icon: RiArrowLeftRightLine, activeIcon: RiArrowLeftRightFill },
 ]

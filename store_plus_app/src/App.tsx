@@ -11,6 +11,8 @@ import Operations from './screens/Operations'
 import Profitability from './screens/Profitability'
 import Network from './screens/Network'
 import ProductMix from './screens/ProductMix'
+import StoreDetail from './screens/StoreDetail'
+import Transfers from './screens/Transfers'
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
               <Route path="/profitability" element={<Profitability />} />
               <Route path="/network" element={<Network />} />
               <Route path="/productmix" element={<ProductMix />} />
+              <Route path="/store/:code" element={<StoreDetail />} />
+              <Route path="/transfers" element={<Transfers />} />
               <Route path="*" element={<Navigate to="/overview" replace />} />
             </Routes>
           </div>

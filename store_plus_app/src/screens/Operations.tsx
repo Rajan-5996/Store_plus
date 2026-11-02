@@ -1,6 +1,8 @@
 import { RiTimeLine, RiTeamLine, RiPauseCircleLine, RiSpeedUpLine } from '@remixicon/react'
 import LineChart from '../components/charts/LineChart'
+import AgentActions from '../components/ui/AgentActions'
 import Box from '../components/ui/Box'
+import StoreLink from '../components/ui/StoreLink'
 import KpiGrid from '../components/ui/KpiGrid'
 import { Axis } from '../components/ui/Legend'
 import ScreenData from '../components/ui/ScreenData'
@@ -26,28 +28,17 @@ function OperationsBody({ d }: { d: OperationsData }) {
           { label: 'Orders per picker-hour', value: num1(kpis.ordersPerPickerHour) },
         ]}
       />
-      <div className="grid g21 mt">
+      <div className="grid g21 mt fill-grid">
         <Box title="Time to pick by hour (minutes)">
           <LineChart series={[{ v: q.values, c: 'var(--ink)' }]} h={150} min={lo} max={hi} shade={q.peak} />
           <Axis labels={[tick(0), tick(Math.round(last / 4)), tick(Math.round(last / 2)), tick(Math.round((3 * last) / 4)), tick(last)]} />
         </Box>
-        <Box title="Potential bottleneck checks">
-          <ul>
-            <li>Orders arriving faster than pickers can process.</li>
-            <li>Long walking paths or poor slotting.</li>
-            <li>Packing / staging congestion after picking.</li>
-            <li>Staffing mismatch between shifts and demand.</li>
-          </ul>
-          <div className="callout">
-            Recommend a fix only after identifying the constrained process step and estimating its cost and expected
-            throughput uplift.
-          </div>
-        </Box>
+        <AgentActions scope="operations" fill />
       </div>
       <Box className="mt scroll" title="Operational intervention candidates">
         <SimpleTable
           head={['Store', 'Observed issue', 'Evidence needed', 'Potential intervention', 'Measure success by']}
-          rows={d.candidates.map((c) => [c.code, c.issue, c.evidence, c.intervention, c.measure])}
+          rows={d.candidates.map((c) => [<StoreLink code={c.code} />, c.issue, c.evidence, c.intervention, c.measure])}
         />
       </Box>
     </>

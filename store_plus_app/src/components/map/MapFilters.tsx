@@ -3,7 +3,7 @@ import { RiMapPin2Line, RiStore2Line } from '@remixicon/react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import FilterSelect from '@/components/ui/FilterSelect'
 import { selectCityStores } from '@/features/dashboard/selectors'
-import { fetchFilterOptions, setCity, setStore } from '@/features/filters/filtersSlice'
+import { fetchFilterOptions, setCity, setFocus, setStore } from '@/features/filters/filtersSlice'
 
 /** City and store filters floating on the map. They share the app-wide City filter held in Redux. */
 export default function MapFilters() {
@@ -36,7 +36,11 @@ export default function MapFilters() {
         icon={RiStore2Line}
         options={[allStores, ...stores.map(label)]}
         defaultValue={current ? label(current) : allStores}
-        onChange={(v) => dispatch(setStore(v === allStores ? 'all' : (stores.find((w) => label(w) === v)?.id ?? 'all')))}
+        onChange={(v) => {
+          const id = v === allStores ? 'all' : (stores.find((w) => label(w) === v)?.id ?? 'all')
+          dispatch(setStore(id))
+          dispatch(setFocus(id === 'all' ? null : id))
+        }}
       />
     </div>
   )

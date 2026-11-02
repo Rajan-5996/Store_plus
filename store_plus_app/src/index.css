@@ -8,6 +8,7 @@
 @import './styles/layout.css' layer(components);
 @import './styles/components.css' layer(components);
 @import './styles/extras.css' layer(components);
+@import './styles/recommend.css' layer(components);
 
 @custom-variant dark (&:is(.dark *));
 
@@ -16,6 +17,10 @@
 @theme inline {
   --color-brand: var(--brand);
   --color-salt: var(--salt);
+  --color-cool: var(--cool);
+  --color-cool-bg: var(--cool-bg);
+  --color-cool-text: var(--cool-text);
+  --color-brand-ink: var(--brand-ink);
   --color-paper: var(--paper);
   --color-surface: var(--surface);
   --color-sunk: var(--sunk);

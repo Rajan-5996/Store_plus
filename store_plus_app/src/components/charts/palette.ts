@@ -25,6 +25,7 @@ export const resolveColor = (c?: string): string => {
 
 export const tooltipStyle = {
   contentStyle: {
+    backgroundColor: 'var(--surface)',
     borderRadius: 10,
     border: '1px solid rgba(0,0,0,.08)',
     boxShadow: '0 6px 20px rgba(0,0,0,.12)',

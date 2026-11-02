@@ -6,6 +6,8 @@ interface FiltersState {
   city: string
   /** Store code selected on the map ('all' = every store of the city). */
   store: string
+  /** Store whose recommendations the Network page shows (a pin the user clicked), or null. */
+  focus: string | null
   range: string
   options: FilterOptions
 }
@@ -13,6 +15,7 @@ interface FiltersState {
 const initialState: FiltersState = {
   city: 'all',
   store: 'all',
+  focus: null,
   range: '30d',
   options: {
     cities: [{ code: 'all', name: 'All cities' }],
@@ -29,6 +32,10 @@ const filtersSlice = createSlice({
     setCity: (s, a: PayloadAction<string>) => {
       s.city = a.payload
       s.store = 'all'
+      s.focus = null
+    },
+    setFocus: (s, a: PayloadAction<string | null>) => {
+      s.focus = a.payload
     },
     setStore: (s, a: PayloadAction<string>) => {
       s.store = a.payload
@@ -44,5 +51,5 @@ const filtersSlice = createSlice({
   },
 })
 
-export const { setCity, setStore, setRange } = filtersSlice.actions
+export const { setCity, setStore, setFocus, setRange } = filtersSlice.actions
 export default filtersSlice.reducer

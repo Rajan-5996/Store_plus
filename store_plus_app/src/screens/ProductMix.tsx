@@ -1,4 +1,5 @@
 import { RiShoppingBasketLine, RiLayoutGridLine, RiPriceTag3Line, RiLightbulbFlashLine } from '@remixicon/react'
+import AgentActions from '../components/ui/AgentActions'
 import Box from '../components/ui/Box'
 import KpiGrid from '../components/ui/KpiGrid'
 import ScreenData from '../components/ui/ScreenData'
@@ -21,7 +22,7 @@ function ProductMixBody({ d }: { d: ProductMixData }) {
           { label: 'Assortment opportunities', value: fmt(d.kpis.assortmentOpportunities) },
         ]}
       />
-      <div className="grid g2 mt">
+      <div className="grid g2 mt fill-grid">
         <Box title="Category contribution profile (product margin %)">
           <ScoreBars
             rows={d.categoryProfile.map((c) => ({
@@ -32,14 +33,7 @@ function ProductMixBody({ d }: { d: ProductMixData }) {
             }))}
           />
         </Box>
-        <Box title="Assortment recommendations">
-          <ul>
-            <li>Identify products with strong demand and positive contribution.</li>
-            <li>Review discounts that increase volume but reduce contribution.</li>
-            <li>Find basket-complement products and category gaps by neighbourhood.</li>
-            <li>Separate margin improvement from price increases that may harm conversion.</li>
-          </ul>
-        </Box>
+        <AgentActions scope="productmix" title="Assortment recommendations" fill />
       </div>
       <Box className="mt scroll" title="SKU and category opportunities">
         <SimpleTable

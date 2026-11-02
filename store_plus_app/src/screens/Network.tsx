@@ -6,6 +6,7 @@ import Pill from '../components/ui/Pill'
 import ScreenData from '../components/ui/ScreenData'
 import ScreenHeader from '../components/ui/ScreenHeader'
 import SimpleTable from '../components/ui/SimpleTable'
+import NetworkInsights from './network/NetworkInsights'
 import { fmt } from '../lib/format'
 import type { NetworkData } from '../types/api'
 
@@ -21,18 +22,11 @@ function NetworkBody({ d }: { d: NetworkData }) {
           { label: 'Expansion candidates', value: fmt(d.kpis.expansionCandidates) },
         ]}
       />
-      <div className="grid g21 mt">
+      <div className="grid g21 mt fill-grid">
         <Box title="Catchment and store coverage">
           <NetworkMap />
         </Box>
-        <Box title="Network decisions to evaluate">
-          <ul>
-            <li>Can a nearby store absorb demand from an underutilised store?</li>
-            <li>Do service zones overlap without improving customer coverage?</li>
-            <li>Are there demand pockets with poor service coverage?</li>
-            <li>Would a new location improve economics after cannibalisation?</li>
-          </ul>
-        </Box>
+        <NetworkInsights />
       </div>
       <Box className="mt scroll" title="Location decision scorecard">
         <SimpleTable

@@ -1,4 +1,5 @@
 import { RiCheckboxCircleLine, RiFundsLine, RiMoneyRupeeCircleLine, RiPieChart2Line } from '@remixicon/react'
+import AgentActions from '../components/ui/AgentActions'
 import Box from '../components/ui/Box'
 import KeyValue from '../components/ui/KeyValue'
 import KpiGrid from '../components/ui/KpiGrid'
@@ -7,12 +8,6 @@ import ScreenHeader from '../components/ui/ScreenHeader'
 import { ScoreBars } from '../components/ui/ScoreBar'
 import { fmt, pct, rupee, rupeeShort } from '../lib/format'
 import type { ProfitabilityData } from '../types/api'
-
-const decisions = [
-  ['Increase throughput', 'Estimate additional contribution after incremental staffing and fulfilment costs.'],
-  ['Reduce controllable costs', 'Compare shift plans, rent, utilities and process cost against matched peers.'],
-  ['Evaluate store action', 'Compare improve, maintain, relocate or exit scenarios using payback and risk.'],
-]
 
 function ProfitabilityBody({ d }: { d: ProfitabilityData }) {
   const { kpis, focusStore: s } = d
@@ -46,16 +41,9 @@ function ProfitabilityBody({ d }: { d: ProfitabilityData }) {
           <ScoreBars rows={d.costBreakdown.map((c) => ({ label: c.label, pct: c.pct, value: pct(c.pct) }))} />
         </Box>
       </div>
-      <Box className="mt" title="Decision support">
-        <div className="module-grid">
-          {decisions.map(([t, p]) => (
-            <div key={t} className="module-card">
-              <h3>{t}</h3>
-              <p>{p}</p>
-            </div>
-          ))}
-        </div>
-      </Box>
+      <div className="mt">
+        <AgentActions scope="profitability" />
+      </div>
     </>
   )
 }

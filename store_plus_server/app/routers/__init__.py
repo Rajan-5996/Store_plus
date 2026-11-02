@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends
 
 from app.core.filters import Filters, get_filters
-from app.routers import meta
+from app.routers import agent, meta, stores, transfers
 from app.services import inventory, network, operations, overview, productmix, profitability, utilisation
 
 SCREENS = {
@@ -26,4 +26,4 @@ def _screen_router(name: str, fn) -> APIRouter:
     return router
 
 
-ROUTERS = [meta.router, *(_screen_router(n, fn) for n, fn in SCREENS.items())]
+ROUTERS = [meta.router, agent.router, stores.router, transfers.router, *(_screen_router(n, fn) for n, fn in SCREENS.items())]

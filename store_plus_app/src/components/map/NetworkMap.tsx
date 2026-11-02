@@ -2,10 +2,12 @@ import { useAppSelector } from '@/app/hooks'
 import { selectMapWarehouses } from '@/features/dashboard/selectors'
 import { Map, MapControls } from '@/components/ui/map'
 import { STATUS_COLORS, STATUS_LABELS, type WarehouseStatus } from '@/data/warehouses'
+import FocusCamera from './FocusCamera'
 import MapCamera from './MapCamera'
 import MapFilters from './MapFilters'
 import { cameraTarget } from './cameraTarget'
 import OrbitGestures from './OrbitGestures'
+import RebalanceLines from './RebalanceLines'
 import WarehouseLayer from './WarehouseLayer'
 import WarehouseMarkers from './WarehouseMarkers'
 
@@ -27,6 +29,8 @@ export default function NetworkMap() {
         <WarehouseMarkers />
         <MapControls position="top-right" showZoom showCompass showFullscreen />
         <MapCamera />
+        <FocusCamera />
+        <RebalanceLines />
         <OrbitGestures />
       </Map>
       <MapFilters />
@@ -39,7 +43,7 @@ export default function NetworkMap() {
             {STATUS_LABELS[s]}
           </span>
         ))}
-        <span className="text-muted-foreground">Drag to rotate and tilt · Scroll or swipe to move the map · Pinch to zoom · Click a pin to fly in{nationwide && ' · Pick a city to see its stores up close'}</span>
+        <span className="text-muted-foreground">Drag to rotate and tilt · Scroll or swipe to move the map · Pinch to zoom · Click a pin for its recommendations{nationwide && ' · Pick a city to see its stores up close'}</span>
       </div>
     </div>
   )

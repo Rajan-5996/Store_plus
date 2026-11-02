@@ -3,7 +3,9 @@ import { fmt, frac, pct, rupee, rupeeShort } from '../lib/format'
 import CandleChart from '../components/charts/CandleChart'
 import RadarTrend from '../components/charts/RadarTrend'
 import AreaChart from '../components/charts/AreaChart'
+import AgentActions from '../components/ui/AgentActions'
 import Box from '../components/ui/Box'
+import StoreLink from '../components/ui/StoreLink'
 import KpiGrid from '../components/ui/KpiGrid'
 import ScreenData from '../components/ui/ScreenData'
 import SimpleTable from '../components/ui/SimpleTable'
@@ -69,7 +71,7 @@ function OverviewBody({ d }: { d: OverviewData }) {
               head={['Store', { t: 'Loss/day', r: true }, 'Cause']}
               rows={d.topLosers.map((s) => [
                 <>
-                  <b>{s.id}</b> {s.area}
+                  <StoreLink code={s.id} /> {s.area}
                 </>,
                 { v: rupee(s.lossPerDay), r: true, cls: 'loss' },
                 s.cause,
@@ -77,6 +79,9 @@ function OverviewBody({ d }: { d: OverviewData }) {
             />
           </div>
         </Box>
+      </div>
+      <div className="mt">
+        <AgentActions scope="overview" />
       </div>
     </>
   )

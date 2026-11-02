@@ -1,4 +1,5 @@
 import { Bar, CartesianGrid, ComposedChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { fmt } from '../../lib/format'
 import { BLUE, INK, ORANGE, tooltipStyle } from './palette'
 
 export interface Candle {
@@ -44,6 +45,35 @@ function CandleShape({ x = 0, y = 0, width = 0, height = 0, payload }: ShapeProp
   )
 }
 
+interface TipProps {
+  active?: boolean
+  payload?: { payload: Candle & { i: number } }[]
+}
+
+/** Hover panel: week title, then Open / High / Low / Close one below the other. */
+function CandleTip({ active, payload }: TipProps) {
+  const c = payload?.[0]?.payload
+  if (!active || !c) return null
+  const rows: [string, number][] = [['Open', c.open], ['High', c.high], ['Low', c.low], ['Close', c.close]]
+  const up = c.close >= c.open
+  return (
+    <div className="min-w-36 rounded-[10px] border border-line-soft bg-surface px-3 py-2.5 text-xs shadow-raised">
+      <div className="mb-1.5 text-[13px] font-extrabold">Week {c.i + 1}</div>
+      <div className="flex flex-col gap-1">
+        {rows.map(([label, v]) => (
+          <div key={label} className="flex items-center justify-between gap-6">
+            <span className="text-muted">{label}</span>
+            <b>{fmt(v)}</b>
+          </div>
+        ))}
+      </div>
+      <div className="mt-1.5 border-t border-line-soft pt-1.5 font-bold" style={{ color: up ? BLUE : ORANGE }}>
+        {up ? 'Closed higher' : 'Closed lower'}
+      </div>
+    </div>
+  )
+}
+
 /** Candlestick chart (open / high / low / close per period) built on a recharts range bar. */
 export default function CandleChart({ candles, h = 150, refY, min, max }: Props) {
   const data = candles.map((c, i) => ({ i, ...c, range: [c.low, c.high] as [number, number] }))
@@ -54,14 +84,7 @@ export default function CandleChart({ candles, h = 150, refY, min, max }: Props)
           <CartesianGrid stroke="rgba(100,116,139,.18)" strokeDasharray="3 4" vertical={false} />
           <XAxis dataKey="i" hide />
           <YAxis hide domain={[min ?? 'dataMin', max ?? 'dataMax']} />
-          <Tooltip
-            {...tooltipStyle}
-            labelFormatter={(_, p) => `Week ${((p?.[0]?.payload as { i: number } | undefined)?.i ?? 0) + 1}`}
-            formatter={(_, __, item) => {
-              const c = item.payload as Candle
-              return [`O ${c.open}  H ${c.high}  L ${c.low}  C ${c.close}`, 'Orders']
-            }}
-          />
+          <Tooltip content={<CandleTip />} cursor={tooltipStyle.cursor} />
           <Bar dataKey="range" shape={<CandleShape />} isAnimationActive={false} />
           {refY != null && <ReferenceLine y={refY} stroke={INK} strokeWidth={2} strokeDasharray="6 5" />}
         </ComposedChart>

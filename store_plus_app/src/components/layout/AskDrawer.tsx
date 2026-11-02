@@ -1,37 +1,31 @@
+import { useAppDispatch, useAppSelector } from '@/app/hooks'
+import { clearChat } from '@/features/chat/chatSlice'
 import { useUI } from '../../context/UIContext'
+import ChatInput from './chat/ChatInput'
+import ChatMessages from './chat/ChatMessages'
 
-const chips = ['Which stores have evening stock-outs?', 'What if we merge #412 and #415?']
-
+/** The Pulse AI side drawer: a chat with the backend agent. */
 export default function AskDrawer() {
   const { drawerOpen, closeDrawer } = useUI()
+  const dispatch = useAppDispatch()
+  const hasMessages = useAppSelector((s) => s.chat.messages.length > 0)
   return (
     <aside className={`drawer ${drawerOpen ? 'open' : ''}`} aria-label="Pulse AI">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ margin: 0 }}>Pulse AI</h2>
-        <button className="btn ghost" type="button" onClick={closeDrawer}>Close</button>
-      </div>
-      <div className="msgs">
-        <div className="msg me">Why is #412 worse than #389?</div>
-        <div className="msg">
-          Both stores are the same size with similar demand. The difference is evening operations: #412’s pick time
-          rises to 9.5 min between 7 and 9 p.m., versus 4.1 min at #389, so #412 pauses orders for about 85 min a day.
-          <div className="ph" style={{ marginTop: 8, minHeight: 60 }}>
-            <span>Mini chart: pick time by hour, both stores</span>
-          </div>
-          <div style={{ fontSize: 12.5, color: 'var(--muted)', marginTop: 6 }}>
-            Data: operations table, 1–28 Oct
-          </div>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {hasMessages && (
+            <button className="btn ghost" type="button" onClick={() => dispatch(clearChat())}>
+              New chat
+            </button>
+          )}
+          <button className="btn ghost" type="button" onClick={closeDrawer}>
+            Close
+          </button>
         </div>
       </div>
-      <div className="chips">
-        {chips.map((c) => (
-          <button key={c} className="chip" type="button">{c}</button>
-        ))}
-      </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <input className="ctl" style={{ flex: 1 }} placeholder="Ask about any store" aria-label="Question" />
-        <button className="btn solid" type="button">Ask</button>
-      </div>
+      <ChatMessages />
+      <ChatInput />
     </aside>
   )
 }

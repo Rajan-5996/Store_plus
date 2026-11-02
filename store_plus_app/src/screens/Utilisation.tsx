@@ -1,6 +1,8 @@
 import { RiDashboard3Line, RiBuilding2Line, RiTimerFlashLine, RiShoppingCart2Line } from '@remixicon/react'
 import BarChart from '../components/charts/BarChart'
+import AgentActions from '../components/ui/AgentActions'
 import Box from '../components/ui/Box'
+import StoreLink from '../components/ui/StoreLink'
 import KpiGrid from '../components/ui/KpiGrid'
 import { Legend, LegendItem } from '../components/ui/Legend'
 import ScreenData from '../components/ui/ScreenData'
@@ -25,7 +27,7 @@ function UtilisationBody({ d }: { d: UtilisationData }) {
           { label: 'Potential additional orders/day', value: fmt(d.kpis.potentialOrdersDay) },
         ]}
       />
-      <div className="grid g21 mt">
+      <div className="grid g21 mt fill-grid">
         <Box title="Capacity utilisation by store">
           <BarChart values={sorted.map((s) => Math.round(s.utilisation * 100))} h={150} max={100} refX={spare / (sorted.length || 1)} />
           <Legend>
@@ -34,23 +36,15 @@ function UtilisationBody({ d }: { d: UtilisationData }) {
             <LegendItem kind="dash">Target utilisation</LegendItem>
           </Legend>
         </Box>
-        <Box title="Recommended actions">
-          <ul>
-            <li>Shift eligible demand to nearby stores with headroom.</li>
-            <li>Review peak-hour staffing where throughput is constrained.</li>
-            <li>Separate demand shortage from fulfilment-capacity shortage.</li>
-          </ul>
-          <div className="callout">
-            Do not treat theoretical maximum capacity as achievable capacity. Calibrate it using actual operating
-            hours, staffing, order mix and service-level constraints.
-          </div>
-        </Box>
+        <AgentActions scope="utilisation" fill />
       </div>
       <Box className="mt scroll" title="Store utilisation opportunities">
         <SimpleTable
           head={['Store', 'Orders/day', 'Estimated capacity', 'Utilisation', 'Likely constraint', 'Next action']}
           rows={sorted.slice(0, 8).map((s) => [
-            `${s.code} · ${s.area}`,
+            <>
+              <StoreLink code={s.code} /> · {s.area}
+            </>,
             fmt(s.ordersDay),
             fmt(s.capacityDay),
             frac(s.utilisation),

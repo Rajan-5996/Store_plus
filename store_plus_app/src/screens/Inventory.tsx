@@ -1,5 +1,7 @@
 import { RiAlarmWarningLine, RiBox3Line, RiHourglass2Line, RiNotification3Line } from '@remixicon/react'
+import AgentActions from '../components/ui/AgentActions'
 import Box from '../components/ui/Box'
+import StoreLink from '../components/ui/StoreLink'
 import KpiGrid from '../components/ui/KpiGrid'
 import Pill from '../components/ui/Pill'
 import ScreenData from '../components/ui/ScreenData'
@@ -23,24 +25,17 @@ function InventoryBody({ d }: { d: InventoryData }) {
           { label: 'Replenishment alerts', value: fmt(d.kpis.replenishmentAlerts) },
         ]}
       />
-      <div className="grid g2 mt">
+      <div className="grid g2 mt fill-grid">
         <Box title="Inventory health by category">
           <ScoreBars rows={cats.map((c) => ({ label: c.label, pct: c.pct, value: pct(c.pct, 1), hot: c.pct < 95 }))} />
         </Box>
-        <Box title="Recommended inventory actions">
-          <ol>
-            <li>Forecast SKU demand by store and time window.</li>
-            <li>Flag likely stockouts before peak demand.</li>
-            <li>Recommend replenishment quantities with lead time and shelf-life constraints.</li>
-            <li>Identify ageing stock for transfer, markdown or controlled liquidation.</li>
-          </ol>
-        </Box>
+        <AgentActions scope="inventory" title="Recommended inventory actions" fill />
       </div>
       <Box className="mt scroll" title="SKU action queue">
         <SimpleTable
           head={['Store', 'SKU / product', 'On hand', 'Forecast demand', 'Risk', 'Suggested action']}
           rows={d.queue.map((q) => [
-            q.code,
+            <StoreLink code={q.code} />,
             q.sku,
             fmt(q.onHand),
             fmt(q.forecast),
