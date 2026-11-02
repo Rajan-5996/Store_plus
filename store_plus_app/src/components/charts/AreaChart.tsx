@@ -11,7 +11,7 @@ export default function AreaChart({ rows, h = 220 }: { rows: AreaRow[]; h?: numb
   return (
     <div style={{ height: h }} role="img" aria-label="Area chart">
       <ResponsiveContainer width="100%" height="100%">
-        <RAreaChart data={rows} margin={{ top: 22, right: 18, bottom: 0, left: 18 }}>
+        <RAreaChart data={rows} margin={{ top: 22, right: 34, bottom: 0, left: 34 }}>
           <defs>
             <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={BLUE} stopOpacity={0.55} />

@@ -1,33 +1,35 @@
+import { RiTimeLine, RiTeamLine, RiPauseCircleLine, RiSpeedUpLine } from '@remixicon/react'
 import LineChart from '../components/charts/LineChart'
 import Box from '../components/ui/Box'
-import { RiTimeLine, RiTeamLine, RiPauseCircleLine, RiSpeedUpLine } from '@remixicon/react'
 import KpiGrid from '../components/ui/KpiGrid'
 import { Axis } from '../components/ui/Legend'
+import ScreenData from '../components/ui/ScreenData'
 import ScreenHeader from '../components/ui/ScreenHeader'
 import SimpleTable from '../components/ui/SimpleTable'
+import { fmt, hourLabel, num1 } from '../lib/format'
+import type { OperationsData } from '../types/api'
 
-const pickByHour = [4.1, 4.0, 4.2, 4.3, 4.4, 4.5, 4.8, 5.0, 5.4, 6.2, 7.8, 9.5, 9.1, 7.4, 5.6, 4.8]
-
-export default function Operations() {
+function OperationsBody({ d }: { d: OperationsData }) {
+  const { kpis, queueByHour: q } = d
+  const lo = Math.max(0, Math.floor(Math.min(...q.values) - 0.5))
+  const hi = Math.ceil(Math.max(...q.values) + 0.5)
+  const tick = (i: number) => hourLabel(q.hours[Math.min(q.hours.length - 1, i)])
+  const last = q.hours.length - 1
   return (
-    <section>
-      <ScreenHeader
-        title="Operational efficiency"
-        sub="Find the process step that limits order throughput: picking, packing, staging, handover or staffing."
-      />
+    <>
       <KpiGrid
         icons={[RiTimeLine, RiTeamLine, RiPauseCircleLine, RiSpeedUpLine]}
         items={[
-          { label: 'Median pick time', value: '5.8 min' },
-          { label: 'Peak queue time', value: '9.5 min', tone: 'loss' },
-          { label: 'Order pause time/day', value: '85 min' },
-          { label: 'Orders per picker-hour', value: '18' },
+          { label: 'Median pick time', value: `${num1(kpis.medianPickMin)} min` },
+          { label: 'Peak queue time', value: `${kpis.peakQueueMin == null ? '–' : kpis.peakQueueMin.toFixed(2)} min`, tone: 'loss' },
+          { label: 'Order pause time/day', value: `${fmt(kpis.pauseMinDay ?? 0)} min` },
+          { label: 'Orders per picker-hour', value: num1(kpis.ordersPerPickerHour) },
         ]}
       />
       <div className="grid g21 mt">
-        <Box title="Picking time by hour">
-          <LineChart series={[{ v: pickByHour, c: 'var(--ink)' }]} h={150} min={0} max={11} shade={[10, 13]} />
-          <Axis labels={['8 AM', '12 PM', '4 PM', '8 PM', '12 AM']} />
+        <Box title="Time to pick by hour (minutes)">
+          <LineChart series={[{ v: q.values, c: 'var(--ink)' }]} h={150} min={lo} max={hi} shade={q.peak} />
+          <Axis labels={[tick(0), tick(Math.round(last / 4)), tick(Math.round(last / 2)), tick(Math.round((3 * last) / 4)), tick(last)]} />
         </Box>
         <Box title="Potential bottleneck checks">
           <ul>
@@ -45,13 +47,21 @@ export default function Operations() {
       <Box className="mt scroll" title="Operational intervention candidates">
         <SimpleTable
           head={['Store', 'Observed issue', 'Evidence needed', 'Potential intervention', 'Measure success by']}
-          rows={[
-            ['#412', 'Evening picking queue', 'Pick events, queue length, shift roster', 'Peak-hour picker or re-slotting', 'Orders/hour, pick time, pause minutes'],
-            ['#233', 'Low throughput', 'Order funnel and staffing', 'Shift / process review', 'Throughput and cost/order'],
-            ['#118', 'Replenishment interruptions', 'Receiving and shelf-fill timestamps', 'Change replenishment window', 'Availability and fulfilment time'],
-          ]}
+          rows={d.candidates.map((c) => [c.code, c.issue, c.evidence, c.intervention, c.measure])}
         />
       </Box>
+    </>
+  )
+}
+
+export default function Operations() {
+  return (
+    <section>
+      <ScreenHeader
+        title="Operational efficiency"
+        sub="Find the process step that limits order throughput: picking, packing, staging, handover or staffing."
+      />
+      <ScreenData name="operations">{(d) => <OperationsBody d={d} />}</ScreenData>
     </section>
   )
 }

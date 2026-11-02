@@ -1,5 +1,8 @@
+import { useEffect } from 'react'
 import { RiCalendarLine, RiMapPin2Line, RiMoonClearLine, RiSunFoggyLine, RiSunLine } from '@remixicon/react'
 import FilterSelect from '@/components/ui/FilterSelect'
+import { useAppDispatch, useAppSelector } from '@/app/hooks'
+import { fetchFilterOptions, setCity, setRange } from '@/features/filters/filtersSlice'
 import { useGreeting, type DayPeriod } from '@/hooks/useGreeting'
 import { USER_NAME } from '../../data/user'
 import HeroArt from './HeroArt'
@@ -24,6 +27,16 @@ const copy: Record<DayPeriod, { icon: typeof RiSunLine; hello: string; line: str
 
 export default function GreetingHero() {
   const { icon: Icon, hello, line } = copy[useGreeting()]
+  const dispatch = useAppDispatch()
+  const { city, range, options } = useAppSelector((s) => s.filters)
+
+  useEffect(() => {
+    void dispatch(fetchFilterOptions())
+  }, [dispatch])
+
+  const cityName = options.cities.find((c) => c.code === city)?.name
+  const rangeLabel = options.ranges.find((r) => r.key === range)?.label
+
   return (
     <section className="hero">
       <HeroArt />
@@ -36,8 +49,23 @@ export default function GreetingHero() {
           <p className="sub !mb-0">{line}</p>
         </div>
         <div className="hero-filters">
-          <FilterSelect label="City" icon={RiMapPin2Line} options={["All cities", "Bengaluru", "Hyderabad", "Mumbai"]} />
-          <FilterSelect label="Date range" icon={RiCalendarLine} options={["Last 7 days", "Last 30 days", "Last 90 days"]} defaultValue="Last 30 days" />
+          {/* keyed on the loaded options so the dropdown shows the real city / range names */}
+          <FilterSelect
+            key={`c-${options.cities.length}`}
+            label="City"
+            icon={RiMapPin2Line}
+            options={options.cities.map((c) => c.name)}
+            defaultValue={cityName}
+            onChange={(name) => dispatch(setCity(options.cities.find((c) => c.name === name)?.code ?? 'all'))}
+          />
+          <FilterSelect
+            key={`r-${options.ranges.length}`}
+            label="Date range"
+            icon={RiCalendarLine}
+            options={options.ranges.map((r) => r.label)}
+            defaultValue={rangeLabel}
+            onChange={(label) => dispatch(setRange(options.ranges.find((r) => r.label === label)?.key ?? '30d'))}
+          />
         </div>
       </div>
     </section>

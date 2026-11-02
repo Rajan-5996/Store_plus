@@ -1,10 +1,14 @@
 import { MapMarker, MarkerContent, MarkerPopup, useMap } from '@/components/ui/map'
-import { STATUS_COLORS, warehouses } from '@/data/warehouses'
+import { useAppSelector } from '@/app/hooks'
+import { selectAllWarehouses } from '@/features/dashboard/selectors'
+import { STATUS_COLORS } from '@/data/warehouses'
+import { rupee } from '@/lib/format'
 import { flyToWarehouse } from './flyToWarehouse'
 
 /** Store pins with a details popup; clicking a pin also flies the camera to that warehouse. */
 export default function WarehouseMarkers() {
   const { map } = useMap()
+  const warehouses = useAppSelector(selectAllWarehouses)
   return (
     <>
       {warehouses.map((w) => (
@@ -28,7 +32,7 @@ export default function WarehouseMarkers() {
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Daily P&amp;L</span>
-                <b style={{ color: STATUS_COLORS[w.status] }}>{w.pnl}</b>
+                <b style={{ color: STATUS_COLORS[w.status] }}>{rupee(w.pnlDay)}/day</b>
               </div>
               <div className="text-xs text-muted-foreground">{w.note}</div>
             </div>

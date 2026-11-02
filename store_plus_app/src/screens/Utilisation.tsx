@@ -1,33 +1,37 @@
+import { RiDashboard3Line, RiBuilding2Line, RiTimerFlashLine, RiShoppingCart2Line } from '@remixicon/react'
 import BarChart from '../components/charts/BarChart'
 import Box from '../components/ui/Box'
-import { RiDashboard3Line, RiBuilding2Line, RiTimerFlashLine, RiShoppingCart2Line } from '@remixicon/react'
 import KpiGrid from '../components/ui/KpiGrid'
 import { Legend, LegendItem } from '../components/ui/Legend'
+import ScreenData from '../components/ui/ScreenData'
 import ScreenHeader from '../components/ui/ScreenHeader'
 import SimpleTable from '../components/ui/SimpleTable'
+import { fmt, frac } from '../lib/format'
+import type { UtilisationData } from '../types/api'
 
-export default function Utilisation() {
+const TARGET = 0.7 // utilisation below this means spare capacity (matches the backend threshold)
+
+function UtilisationBody({ d }: { d: UtilisationData }) {
+  const sorted = [...d.stores].sort((a, b) => a.utilisation - b.utilisation)
+  const spare = sorted.filter((s) => s.utilisation < TARGET).length
   return (
-    <section>
-      <ScreenHeader
-        title="Store utilisation intelligence"
-        sub="Understand how much of each store's available operating capacity is being used, when capacity is constrained, and where more orders can be absorbed."
-      />
+    <>
       <KpiGrid
         icons={[RiDashboard3Line, RiBuilding2Line, RiTimerFlashLine, RiShoppingCart2Line]}
         items={[
-          { label: 'Average capacity utilisation', value: '40%' },
-          { label: 'Stores with spare capacity', value: '28' },
-          { label: 'Peak-hour constrained stores', value: '9' },
-          { label: 'Potential additional orders/day', value: '6,400' },
+          { label: 'Average capacity utilisation', value: frac(d.kpis.avgUtilisation) },
+          { label: 'Stores with spare capacity', value: fmt(d.kpis.spareCapacityStores) },
+          { label: 'Peak-hour constrained stores', value: fmt(d.kpis.constrainedStores) },
+          { label: 'Potential additional orders/day', value: fmt(d.kpis.potentialOrdersDay) },
         ]}
       />
       <div className="grid g21 mt">
-        <Box title="Capacity vs actual orders by store">
-          <BarChart values={[610, 545, 700, 520, 640, 480, 690, 610]} h={150} max={1600} refX={0.48} />
+        <Box title="Capacity utilisation by store">
+          <BarChart values={sorted.map((s) => Math.round(s.utilisation * 100))} h={150} max={100} refX={spare / (sorted.length || 1)} />
           <Legend>
-            <LegendItem>Actual orders</LegendItem>
-            <LegendItem kind="dash">Available capacity reference</LegendItem>
+            <LegendItem color="#FF5200">Spare capacity (below {TARGET * 100}%)</LegendItem>
+            <LegendItem color="#1F6FEB">Well utilised</LegendItem>
+            <LegendItem kind="dash">Target utilisation</LegendItem>
           </Legend>
         </Box>
         <Box title="Recommended actions">
@@ -45,13 +49,28 @@ export default function Utilisation() {
       <Box className="mt scroll" title="Store utilisation opportunities">
         <SimpleTable
           head={['Store', 'Orders/day', 'Estimated capacity', 'Utilisation', 'Likely constraint', 'Next action']}
-          rows={[
-            ['#412 · HSR', '610', '1,500', '41%', 'Peak picking queue', 'Review 7–9 PM throughput'],
-            ['#233 · Kondapur', '545', '1,250', '44%', 'Demand coverage', 'Analyse catchment demand'],
-            ['#118 · Andheri E', '700', '1,300', '54%', 'Stock availability', 'Check replenishment'],
-          ]}
+          rows={sorted.slice(0, 8).map((s) => [
+            `${s.code} · ${s.area}`,
+            fmt(s.ordersDay),
+            fmt(s.capacityDay),
+            frac(s.utilisation),
+            s.constraint,
+            s.action,
+          ])}
         />
       </Box>
+    </>
+  )
+}
+
+export default function Utilisation() {
+  return (
+    <section>
+      <ScreenHeader
+        title="Store utilisation intelligence"
+        sub="Understand how much of each store's available operating capacity is being used, when capacity is constrained, and where more orders can be absorbed."
+      />
+      <ScreenData name="utilisation">{(d) => <UtilisationBody d={d} />}</ScreenData>
     </section>
   )
 }

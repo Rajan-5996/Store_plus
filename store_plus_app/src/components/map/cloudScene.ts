@@ -36,14 +36,14 @@ interface Cloud {
  * Soft puffy clouds drifting high above the city, plus their soft shadows gliding across the map below.
  * The clouds fill the sky when the map is tilted towards the horizon.
  */
-export function buildClouds() {
+export function buildClouds(count = CLOUD_COUNT) {
   const root = new THREE.Group()
   const material = new THREE.MeshLambertMaterial({ color: '#FFF3EA', transparent: true, opacity: 0.93, emissive: '#FFE6D6', emissiveIntensity: 0.35 })
   const shadowMat = new THREE.MeshBasicMaterial({ map: shadowTexture(), transparent: true, opacity: 0.32, depthWrite: false })
   const shadowGeo = new THREE.PlaneGeometry(1, 1)
   const clouds: Cloud[] = []
 
-  for (let i = 0; i < CLOUD_COUNT; i++) {
+  for (let i = 0; i < count; i++) {
     const g = new THREE.Group()
     const puffs = 5 + Math.floor(rand(i + 1) * 4)
     const size = 240 + rand(i + 2) * 340

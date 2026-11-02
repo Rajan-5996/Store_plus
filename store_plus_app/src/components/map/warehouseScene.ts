@@ -20,7 +20,7 @@ function toMetres(lng: number, lat: number, lng0: number, lat0: number) {
 }
 
 /** A MapLibre custom layer that renders 3D warehouses, catchment zones and swarming delivery partners with three.js. */
-export function createWarehouseLayer(mapLib: MapLibreModule, items: Warehouse[]): CustomLayerInterface {
+export function createWarehouseLayer(mapLib: MapLibreModule, items: Warehouse[], id: string = WAREHOUSE_LAYER_ID, cloudCount?: number): CustomLayerInterface {
   const lng0 = items.reduce((a, w) => a + w.lng, 0) / items.length
   const lat0 = items.reduce((a, w) => a + w.lat, 0) / items.length
   const origin = mapLib.MercatorCoordinate.fromLngLat([lng0, lat0], 0)
@@ -29,14 +29,14 @@ export function createWarehouseLayer(mapLib: MapLibreModule, items: Warehouse[])
   const camera = new THREE.Camera()
   const scene = new THREE.Scene()
   const swarm = new Swarm()
-  const clouds = buildClouds()
+  const clouds = buildClouds(cloudCount)
   let renderer: THREE.WebGLRenderer | null = null
   let map: MapLibreMap | null = null
   const rings: THREE.Object3D[] = []
   const beacons: THREE.Object3D[] = []
 
   return {
-    id: WAREHOUSE_LAYER_ID,
+    id,
     type: 'custom',
     renderingMode: '3d',
 

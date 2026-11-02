@@ -29,7 +29,7 @@ export class Swarm {
 
   /** More orders per day means more riders on the road (5 to 12). */
   addFor(scene: THREE.Scene, w: Warehouse, cx: number, cz: number) {
-    const count = Math.max(5, Math.min(12, Math.round(w.orders / 95)))
+    const count = Math.max(5, Math.min(12, Math.round(w.orders / 150)))
     for (let i = 0; i < count; i++) {
       const seed = w.id.charCodeAt(2) * 31 + w.id.charCodeAt(3) * 7 + i * 13
       const rider = buildRider()
