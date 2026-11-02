@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StorePulse AI — Dark Store Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEFF2; --surface:#FFFFFF; --sunk:#F5F7F9; --ink:#22262C; --muted:#68717C;
+  --line:#A9B1BB; --line-soft:#D3D8DE; --annot:#2F5BD3; --annot-bg:#E6EDFF;
+  --loss:#B83B28; --loss-bg:#FBE9E5; --gain:#2B7A4B; --gain-bg:#E3F3E9; --fill:#C9CFD6; --fill-strong:#8C95A0;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#14171B; --surface:#1D2126; --sunk:#181B20; --ink:#E5E8EC; --muted:#9AA3AE;
+    --line:#59626D; --line-soft:#30363E; --annot:#8FB0FF; --annot-bg:#1E2A47;
+    --loss:#F08A75; --loss-bg:#3A221D; --gain:#74C996; --gain-bg:#1B3326; --fill:#3A414A; --fill-strong:#6E7884;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14171B; --surface:#1D2126; --sunk:#181B20; --ink:#E5E8EC; --muted:#9AA3AE;
+  --line:#59626D; --line-soft:#30363E; --annot:#8FB0FF; --annot-bg:#1E2A47;
+  --loss:#F08A75; --loss-bg:#3A221D; --gain:#74C996; --gain-bg:#1B3326; --fill:#3A414A; --fill-strong:#6E7884;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
+  background-size:24px 24px;background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--annot);outline-offset:2px}
+a{color:inherit}
+
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100%}
+.side{background:var(--surface);border-right:1.5px dashed var(--line);padding:20px 14px;position:sticky;top:env(safe-area-inset-top,0px);height:calc(100vh - env(safe-area-inset-top,0px));overflow:auto}
+.brand{font-weight:700;font-size:17px;line-height:1.2;margin:0 6px 22px}
+.brand small{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:4px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;gap:10px;align-items:center;text-decoration:none;padding:9px 10px;border-radius:6px;color:var(--muted)}
+.nav a:hover{background:var(--sunk);color:var(--ink)}
+.nav a[aria-current="page"]{background:var(--sunk);color:var(--ink);font-weight:600;box-shadow:inset 3px 0 0 var(--ink)}
+.nav .num{font-size:12px;width:20px;height:20px;border:1.5px solid currentColor;border-radius:50%;display:grid;place-items:center;flex:none}
+.nav .opt{margin-left:auto;font-size:11px;color:var(--muted)}
+.nav-label{margin:18px 10px 6px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.brand-mark{display:flex;align-items:center;gap:9px}
+.brand-icon{width:30px;height:30px;border-radius:8px;background:var(--ink);color:var(--surface);display:grid;place-items:center;font-size:15px;font-weight:700}
+.demo-banner{display:flex;align-items:center;gap:9px;padding:10px 13px;margin:0 0 18px;border:1px dashed var(--annot);background:var(--annot-bg);border-radius:7px;color:var(--annot);font-size:13px}
+.module-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.module-card{background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:16px;min-height:170px;display:flex;flex-direction:column;gap:8px}
+.module-card p{font-size:13px;color:var(--muted);margin:0}
+.module-card .module-icon{font-size:20px}
+.module-card a{margin-top:auto;font-size:13px;font-weight:600;text-decoration:none;color:var(--annot)}
+.metric-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.metric{padding:12px;border:1px solid var(--line-soft);border-radius:6px;background:var(--sunk)}
+.metric strong{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.metric span{font-size:12px;color:var(--muted)}
+.callout{padding:12px;border-left:3px solid var(--annot);background:var(--annot-bg);border-radius:4px;font-size:13px}
+@media(max-width:980px){.module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.module-grid,.metric-list{grid-template-columns:1fr}}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1.5px dashed var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 24px}
+.top .grow{flex:1}
+.fresh{color:var(--muted);font-size:13px}
+.ctl{border:1.5px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 10px}
+.btn{border:1.5px solid var(--ink);background:var(--surface);border-radius:6px;padding:7px 14px;cursor:pointer;font-weight:500}
+.btn:hover{background:var(--sunk)}
+.btn.solid{background:var(--ink);color:var(--surface)}
+.btn.solid:hover{opacity:.88}
+.btn.ghost{border-color:var(--line)}
+.btn.ok{border-color:var(--gain);color:var(--gain)}
+.btn.no{border-color:var(--loss);color:var(--loss)}
+.toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--annot);cursor:pointer}
+
+main{padding:24px 24px 64px;max-width:1240px;width:100%}
+.screen{display:none}
+.screen.on{display:block}
+h1{font-size:28px;line-height:1.15;margin:0 0 4px;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 20px;max-width:70ch}
+h2{font-size:17px;margin:0 0 12px;font-weight:600}
+h3{font-size:15px;margin:0 0 8px;font-weight:600}
+
+.box{background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:16px;position:relative}
+.box.dash{border-style:dashed}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:1fr 1fr}
+.g21{grid-template-columns:2fr 1fr}
+.mt{margin-top:16px}
+.section{margin-top:28px}
+.section > h2{display:flex;gap:10px;align-items:center}
+.section > h2 .tag{font-size:12px;font-weight:500;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+
+.kpi .label{color:var(--muted);font-size:13px}
+.kpi .val{font-size:30px;font-weight:700;line-height:1.1;margin-top:6px;font-variant-numeric:tabular-nums}
+.kpi .delta{font-size:13px;color:var(--muted);margin-top:4px}
+.loss{color:var(--loss)} .gain{color:var(--gain)}
+.pill{display:inline-block;font-size:12px;border-radius:999px;padding:2px 9px;border:1px solid var(--line);white-space:nowrap}
+.pill.high{border-color:var(--ink);font-weight:600}
+.pill.low{color:var(--muted);border-style:dashed}
+.pill.red{background:var(--loss-bg);color:var(--loss);border-color:transparent}
+.pill.green{background:var(--gain-bg);color:var(--gain);border-color:transparent}
+
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:10px 10px;border-bottom:1px solid var(--line-soft);white-space:nowrap;font-size:14px}
+th{font-size:12.5px;color:var(--muted);font-weight:500;border-bottom:1.5px solid var(--line)}
+td.r,th.r{text-align:right}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--sunk)}
+
+.chart{width:100%;height:auto;display:block}
+.axis{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:4px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;color:var(--muted);font-size:12.5px;margin-top:8px}
+.legend i{display:inline-block;width:14px;height:3px;background:var(--fill-strong);vertical-align:middle;margin-right:6px}
+.legend i.dash{background:none;border-top:2px dashed var(--loss);height:0}
+.legend i.red{background:var(--loss)} .legend i.green{background:var(--gain)}
+
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.filters .ctl{min-width:140px}
+.filters input.ctl{flex:1;min-width:180px}
+
+.scorebar{display:grid;grid-template-columns:110px 1fr 42px;gap:10px;align-items:center;font-size:14px;margin:7px 0}
+.track{height:10px;background:var(--sunk);border:1px solid var(--line-soft);border-radius:5px;overflow:hidden}
+.track span{display:block;height:100%;background:var(--fill-strong)}
+.track span.hot{background:var(--ink)}
+.progress{height:14px;border:1.5px solid var(--line);border-radius:7px;overflow:hidden;background:var(--sunk);margin-top:6px}
+.progress span{display:block;height:100%;background:var(--fill-strong)}
+
+.kv{display:grid;grid-template-columns:1fr auto;gap:6px 14px;font-size:14px;font-variant-numeric:tabular-nums}
+.kv dt{color:var(--muted)} .kv dd{margin:0;text-align:right;font-weight:600}
+
+.cmp{display:grid;grid-template-columns:150px 1fr 1fr;gap:4px 12px;align-items:center;font-size:14px;font-variant-numeric:tabular-nums}
+.cmp .h{color:var(--muted);font-size:12.5px}
+.cmp .bad{color:var(--loss);font-weight:600}
+
+.brief{font-size:15.5px;line-height:1.6;max-width:72ch;margin:0}
+.sources{margin-top:10px;font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;display:none}
+.sources.show{display:block}
+
+.fix{display:flex;flex-direction:column;gap:10px}
+.fix.rec{border-width:2.5px;border-color:var(--ink)}
+.fix .head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.fix details{font-size:13px;color:var(--muted)}
+.fix summary{cursor:pointer;color:var(--ink)}
+
+.ph{border:1.5px dashed var(--line);border-radius:6px;background:repeating-linear-gradient(45deg,transparent 0 10px,var(--sunk) 10px 20px);display:grid;place-items:center;color:var(--muted);font-size:13px;min-height:80px;padding:10px;text-align:center}
+
+/* annotations */
+.n{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--annot);color:var(--surface);font:700 11px/1 "Archivo",sans-serif;vertical-align:middle;margin-right:6px;flex:none}
+.note{font-family:"Kalam","Comic Sans MS","Segoe Print",cursive;color:var(--annot);background:var(--annot-bg);border-radius:6px;padding:6px 10px;font-size:14.5px;line-height:1.35;margin-top:10px;max-width:70ch}
+body.clean .n, body.clean .note{display:none}
+
+/* simulator */
+.slider{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin-bottom:14px;font-size:14px}
+.slider output{font-weight:600;font-variant-numeric:tabular-nums}
+.slider input{grid-column:1/-1;width:100%;accent-color:var(--ink)}
+.big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* matrix */
+.matrix td{text-align:center;min-width:64px}
+.matrix td.diag{background:var(--sunk);font-weight:700}
+
+/* ai drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(400px,100%);background:var(--surface);border-left:1.5px solid var(--ink);z-index:20;transform:translateX(105%);transition:transform .25s ease;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.drawer.open{transform:none}
+.drawer .msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;margin:12px 0}
+.msg{border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px}
+.msg.me{align-self:flex-end;background:var(--sunk);max-width:85%}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{border:1px dashed var(--line);border-radius:999px;padding:4px 10px;font-size:12.5px;background:none;cursor:pointer}
+@media (prefers-reduced-motion: reduce){.drawer{transition:none}}
+
+@media (max-width:980px){
+  .g4{grid-template-columns:1fr 1fr}
+  .g3,.g21{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;border-right:0;border-bottom:1.5px dashed var(--line);padding:12px}
+  .brand{margin-bottom:10px}
+  .nav{flex-direction:row;overflow-x:auto;gap:4px}
+  .nav a{white-space:nowrap}
+  .nav .opt{display:none}
+  .g2{grid-template-columns:1fr}
+  main{padding:16px 14px 48px}
+  .top{padding:10px 14px}
+  .cmp{grid-template-columns:120px 1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="brand-mark"><span class="brand-icon">S</span><span>StorePulse AI</span></div><small>Dark Store Intelligence · FY27</small></div>
+    <nav class="nav" id="nav">
+      <div class="nav-label">Intelligence solutions</div>
+      <a href="#overview" data-s="overview"><span class="num">⌂</span>Network overview</a>
+      <a href="#utilisation" data-s="utilisation"><span class="num">1</span>Store utilisation</a>
+      <a href="#inventory" data-s="inventory"><span class="num">2</span>Inventory intelligence</a>
+      <a href="#operations" data-s="operations"><span class="num">3</span>Operational efficiency</a>
+      <a href="#profitability" data-s="profitability"><span class="num">4</span>Store profitability</a>
+      <a href="#network" data-s="network"><span class="num">5</span>Network optimisation</a>
+      <a href="#productmix" data-s="productmix"><span class="num">6</span>Product mix</a>
+      <div class="nav-label">Decision workspace</div>
+      <a href="#priority" data-s="priority"><span class="num">7</span>Priority list</a>
+      <a href="#store" data-s="store"><span class="num">8</span>Store detail</a>
+      <a href="#map" data-s="map"><span class="num">9</span>Map view</a>
+      <a href="#simulator" data-s="simulator"><span class="num">10</span>What-if simulator</a>
+      <a href="#approvals" data-s="approvals"><span class="num">11</span>Approvals</a>
+      <a href="#experiments" data-s="experiments"><span class="num">12</span>Experiments</a>
+      <a href="#competition" data-s="competition"><span class="num">13</span>Competitor analysis</a>
+    </nav>
+  </aside>
+
+  <div>
+    <header class="top">
+      <select class="ctl" aria-label="City"><option>All cities</option><option>Bengaluru</option><option>Hyderabad</option><option>Mumbai</option></select>
+      <select class="ctl" aria-label="Date range"><option>Last 7 days</option><option selected>Last 30 days</option><option>Last 90 days</option></select>
+      <span class="fresh">FY 2026–27 · Illustrative demo data</span>
+      <span class="grow"></span>
+      <label class="toggle"><input type="checkbox" id="notesToggle" checked> Show notes</label>
+      <button class="btn ghost" type="button">Export</button>
+      <button class="btn solid" type="button" id="askBtn">Ask AI</button>
+    </header>
+
+    <main>
+      <!-- NETWORK OVERVIEW -->
+      <section class="screen" id="s-overview">
+        <h1>StorePulse AI overview</h1>
+        <p class="sub">One intelligence workspace for dark-store utilisation, inventory, operations, profitability, network planning and product mix.</p>
+        <div class="demo-banner"><strong>DEMO DATA</strong><span>All store-level numbers in this wireframe are illustrative placeholders, not Swiggy's actual internal data. Replace them after the source files are profiled.</span></div>
+        <div class="module-grid section" style="margin-top:0;margin-bottom:18px">
+          <article class="module-card"><div class="module-icon">◷</div><h3>Store utilisation</h3><p>Find unused capacity, peak-hour constraints and stores with headroom to absorb more orders.</p><a href="#utilisation">Explore utilisation →</a></article>
+          <article class="module-card"><div class="module-icon">▦</div><h3>Inventory intelligence</h3><p>Detect stockout exposure, excess stock, ageing inventory and replenishment opportunities.</p><a href="#inventory">Explore inventory →</a></article>
+          <article class="module-card"><div class="module-icon">⚙</div><h3>Operational efficiency</h3><p>Investigate picking, packing, queue, staffing and fulfilment bottlenecks.</p><a href="#operations">Explore operations →</a></article>
+          <article class="module-card"><div class="module-icon">₹</div><h3>Store profitability</h3><p>Understand contribution, cost drivers, break-even and intervention economics.</p><a href="#profitability">Explore profitability →</a></article>
+          <article class="module-card"><div class="module-icon">⌖</div><h3>Network optimisation</h3><p>Assess catchment coverage, overlapping zones, store capacity and expansion choices.</p><a href="#network">Explore network →</a></article>
+          <article class="module-card"><div class="module-icon">▤</div><h3>Product mix</h3><p>Understand category and SKU economics, basket contribution and assortment opportunities.</p><a href="#productmix">Explore product mix →</a></article>
+        </div>
+        <div class="grid g4">
+          <div class="box kpi"><div class="label"><span class="n">2</span>Total stores</div><div class="val">50</div><div class="delta">Active dark stores</div></div>
+          <div class="box kpi"><div class="label"><span class="n">3</span>Above break-even</div><div class="val">13 <span style="font-size:18px;color:var(--muted)">(26%)</span></div><div class="delta">37 stores losing money</div></div>
+          <div class="box kpi"><div class="label"><span class="n">4</span>Daily network loss</div><div class="val loss">–₹3.8L</div><div class="delta">From loss-making stores only</div></div>
+          <div class="box kpi"><div class="label"><span class="n">5</span>Avg orders/store/day</div><div class="val">1,034</div><div class="delta">▲ 2% vs last month</div></div>
+        </div>
+        <div class="grid g21 mt">
+          <div class="box">
+            <h3><span class="n">6</span>Stores by orders per day</h3>
+            <div id="histo"></div>
+            <div class="axis"><span>300</span><span>700</span><span>1,100</span><span>1,500+</span></div>
+            <div class="legend"><span><i></i>Number of stores</span><span><i class="dash"></i>Typical break-even (~760)</span></div>
+            <p class="note">Most bars sit left of the red line. That one picture explains the problem.</p>
+          </div>
+          <div class="box">
+            <h3><span class="n">7</span>Weak stores by cause</h3>
+            <div class="scorebar"><span>Stock-out</span><div class="track"><span style="width:100%"></span></div><b>12</b></div>
+            <div class="scorebar"><span>Weak demand</span><div class="track"><span style="width:83%"></span></div><b>10</b></div>
+            <div class="scorebar"><span>Picking queue</span><div class="track"><span style="width:75%"></span></div><b>9</b></div>
+            <div class="scorebar"><span>Overlap</span><div class="track"><span style="width:50%"></span></div><b>6</b></div>
+            <p class="note">Click a bar to filter the priority list by that cause.</p>
+          </div>
+        </div>
+        <div class="grid g2 mt">
+          <div class="box">
+            <h3><span class="n">8</span>Daily network loss, last 90 days</h3>
+            <div id="lossTrend"></div>
+            <div class="axis"><span>1 Aug</span><span>1 Sep</span><span>1 Oct</span><span>Today</span></div>
+          </div>
+          <div class="box">
+            <h3><span class="n">9</span>Top 5 losing stores</h3>
+            <div class="scroll"><table id="top5"></table></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SOLUTION 1: UTILISATION -->
+      <section class="screen" id="s-utilisation">
+        <h1>Store utilisation intelligence</h1>
+        <p class="sub">Understand how much of each store's available operating capacity is being used, when capacity is constrained, and where more orders can be absorbed.</p>
+        <div class="demo-banner">Illustrative metrics only · Actual capacity definitions and data availability will be confirmed after file analysis.</div>
+        <div class="grid g4">
+          <div class="box kpi"><div class="label">Average capacity utilisation</div><div class="val">40%</div><div class="delta">Demo placeholder</div></div>
+          <div class="box kpi"><div class="label">Stores with spare capacity</div><div class="val">28</div><div class="delta">Illustrative count</div></div>
+          <div class="box kpi"><div class="label">Peak-hour constrained stores</div><div class="val">9</div><div class="delta">Illustrative count</div></div>
+          <div class="box kpi"><div class="label">Potential additional orders/day</div><div class="val">6,400</div><div class="delta">Model estimate placeholder</div></div>
+        </div>
+        <div class="grid g21 mt"><div class="box"><h3>Capacity vs actual orders by store</h3><div id="utilChart"></div><div class="legend"><span><i></i>Actual orders</span><span><i class="dash"></i>Available capacity reference</span></div></div><div class="box"><h3>Recommended actions</h3><ul><li>Shift eligible demand to nearby stores with headroom.</li><li>Review peak-hour staffing where throughput is constrained.</li><li>Separate demand shortage from fulfilment-capacity shortage.</li></ul><div class="callout">Do not treat theoretical maximum capacity as achievable capacity. Calibrate it using actual operating hours, staffing, order mix and service-level constraints.</div></div></div>
+        <div class="box mt scroll"><h3>Store utilisation opportunities</h3><table><thead><tr><th>Store</th><th>Orders/day</th><th>Estimated capacity</th><th>Utilisation</th><th>Likely constraint</th><th>Next action</th></tr></thead><tbody><tr><td>#412 · HSR</td><td>610</td><td>1,500</td><td>41%</td><td>Peak picking queue</td><td>Review 7–9 PM throughput</td></tr><tr><td>#233 · Kondapur</td><td>545</td><td>1,250</td><td>44%</td><td>Demand coverage</td><td>Analyse catchment demand</td></tr><tr><td>#118 · Andheri E</td><td>700</td><td>1,300</td><td>54%</td><td>Stock availability</td><td>Check replenishment</td></tr></tbody></table></div>
+      </section>
+
+      <!-- SOLUTION 2: INVENTORY -->
+      <section class="screen" id="s-inventory">
+        <h1>Inventory intelligence</h1>
+        <p class="sub">Reduce lost sales and avoidable inventory cost by connecting demand, availability, replenishment and ageing at store–SKU level.</p>
+        <div class="demo-banner">Illustrative metrics only · Stockout, expiry and inventory value require the corresponding source data.</div>
+        <div class="grid g4"><div class="box kpi"><div class="label">Stockout rate</div><div class="val loss">2.1%</div><div class="delta">Demo placeholder</div></div><div class="box kpi"><div class="label">At-risk inventory</div><div class="val">₹4.8L</div><div class="delta">Illustrative value</div></div><div class="box kpi"><div class="label">Slow-moving SKUs</div><div class="val">186</div><div class="delta">Illustrative count</div></div><div class="box kpi"><div class="label">Replenishment alerts</div><div class="val">42</div><div class="delta">Illustrative count</div></div></div>
+        <div class="grid g2 mt"><div class="box"><h3>Inventory health by category</h3><div class="scorebar"><span>Staples</span><div class="track"><span style="width:88%"></span></div><b>88%</b></div><div class="scorebar"><span>Fruits & veg</span><div class="track"><span class="hot" style="width:63%"></span></div><b>63%</b></div><div class="scorebar"><span>Dairy</span><div class="track"><span style="width:79%"></span></div><b>79%</b></div><div class="scorebar"><span>Personal care</span><div class="track"><span style="width:92%"></span></div><b>92%</b></div><p class="note">Illustrative inventory health score. Final definition must be agreed from source fields.</p></div><div class="box"><h3>Recommended inventory actions</h3><ol><li>Forecast SKU demand by store and time window.</li><li>Flag likely stockouts before peak demand.</li><li>Recommend replenishment quantities with lead time and shelf-life constraints.</li><li>Identify ageing stock for transfer, markdown or controlled liquidation.</li></ol></div></div>
+        <div class="box mt scroll"><h3>SKU action queue</h3><table><thead><tr><th>Store</th><th>SKU / product</th><th>On hand</th><th>Forecast demand</th><th>Risk</th><th>Suggested action</th></tr></thead><tbody><tr><td>#412</td><td>Milk 1L</td><td>18</td><td>34</td><td><span class="pill red">Stockout risk</span></td><td>Replenish 20 units</td></tr><tr><td>#118</td><td>Premium cereal</td><td>74</td><td>12</td><td><span class="pill red">Ageing risk</span></td><td>Review transfer / markdown</td></tr><tr><td>#233</td><td>Cooking oil 1L</td><td>9</td><td>27</td><td><span class="pill">Low cover</span></td><td>Check supplier lead time</td></tr></tbody></table></div>
+      </section>
+
+      <!-- SOLUTION 3: OPERATIONS -->
+      <section class="screen" id="s-operations">
+        <h1>Operational efficiency</h1>
+        <p class="sub">Find the process step that limits order throughput: picking, packing, staging, handover or staffing.</p>
+        <div class="demo-banner">Illustrative metrics only · Event timestamps and shift-level staffing data are needed to validate these measures.</div>
+        <div class="grid g4"><div class="box kpi"><div class="label">Median pick time</div><div class="val">5.8 min</div><div class="delta">Demo placeholder</div></div><div class="box kpi"><div class="label">Peak queue time</div><div class="val loss">9.5 min</div><div class="delta">Demo placeholder</div></div><div class="box kpi"><div class="label">Order pause time/day</div><div class="val">85 min</div><div class="delta">Demo placeholder</div></div><div class="box kpi"><div class="label">Orders per picker-hour</div><div class="val">18</div><div class="delta">Demo placeholder</div></div></div>
+        <div class="grid g21 mt"><div class="box"><h3>Picking time by hour</h3><div id="opsChart"></div><div class="axis"><span>8 AM</span><span>12 PM</span><span>4 PM</span><span>8 PM</span><span>12 AM</span></div></div><div class="box"><h3>Potential bottleneck checks</h3><ul><li>Orders arriving faster than pickers can process.</li><li>Long walking paths or poor slotting.</li><li>Packing / staging congestion after picking.</li><li>Staffing mismatch between shifts and demand.</li></ul><div class="callout">Recommend a fix only after identifying the constrained process step and estimating its cost and expected throughput uplift.</div></div></div>
+        <div class="box mt scroll"><h3>Operational intervention candidates</h3><table><thead><tr><th>Store</th><th>Observed issue</th><th>Evidence needed</th><th>Potential intervention</th><th>Measure success by</th></tr></thead><tbody><tr><td>#412</td><td>Evening picking queue</td><td>Pick events, queue length, shift roster</td><td>Peak-hour picker or re-slotting</td><td>Orders/hour, pick time, pause minutes</td></tr><tr><td>#233</td><td>Low throughput</td><td>Order funnel and staffing</td><td>Shift / process review</td><td>Throughput and cost/order</td></tr><tr><td>#118</td><td>Replenishment interruptions</td><td>Receiving and shelf-fill timestamps</td><td>Change replenishment window</td><td>Availability and fulfilment time</td></tr></tbody></table></div>
+      </section>
+
+      <!-- SOLUTION 4: PROFITABILITY -->
+      <section class="screen" id="s-profitability">
+        <h1>Store profitability intelligence</h1>
+        <p class="sub">Explain store-level contribution and operating economics, identify the cost drivers and compare financially viable fixes.</p>
+        <div class="demo-banner">Illustrative financial example · Contribution and cost definitions must match Swiggy's finance methodology before use.</div>
+        <div class="grid g4"><div class="box kpi"><div class="label">Stores above break-even</div><div class="val">13 / 50</div><div class="delta">Illustrative sample</div></div><div class="box kpi"><div class="label">Network daily loss</div><div class="val loss">₹3.8L</div><div class="delta">Illustrative sample</div></div><div class="box kpi"><div class="label">Average contribution/order</div><div class="val">₹80</div><div class="delta">Illustrative sample</div></div><div class="box kpi"><div class="label">Highest cost driver</div><div class="val" style="font-size:22px">Staff + rent</div><div class="delta">Example only</div></div></div>
+        <div class="grid g2 mt"><div class="box"><h3>Store #412 — illustrative unit economics</h3><dl class="kv"><dt>Orders/day</dt><dd>610</dd><dt>Contribution/order</dt><dd>₹80</dd><dt>Daily contribution</dt><dd>₹48,800</dd><dt>Fixed operating cost/day</dt><dd>₹60,800</dd><dt>Break-even orders/day</dt><dd>760</dd><dt>Estimated daily P&amp;L</dt><dd class="loss">−₹12,000</dd></dl></div><div class="box"><h3>Cost breakdown required</h3><div class="scorebar"><span>Rent</span><div class="track"><span style="width:41%"></span></div><b>41%</b></div><div class="scorebar"><span>Staff</span><div class="track"><span style="width:49%"></span></div><b>49%</b></div><div class="scorebar"><span>Utilities</span><div class="track"><span style="width:10%"></span></div><b>10%</b></div><p class="note">Illustrative split only; actual cost ledger must determine categories and allocation.</p></div></div>
+        <div class="box mt"><h3>Decision support</h3><div class="module-grid"><div class="module-card"><h3>Increase throughput</h3><p>Estimate additional contribution after incremental staffing and fulfilment costs.</p></div><div class="module-card"><h3>Reduce controllable costs</h3><p>Compare shift plans, rent, utilities and process cost against matched peers.</p></div><div class="module-card"><h3>Evaluate store action</h3><p>Compare improve, maintain, relocate or exit scenarios using payback and risk.</p></div></div><p style="margin-top:14px"><a class="btn solid" href="#simulator" style="text-decoration:none">Open what-if simulator</a></p></div>
+      </section>
+
+      <!-- SOLUTION 5: NETWORK -->
+      <section class="screen" id="s-network">
+        <h1>Network optimisation</h1>
+        <p class="sub">Plan store coverage and capacity across neighbourhoods. Find overlap, underserved demand and opportunities to improve the existing footprint.</p>
+        <div class="demo-banner">Illustrative geography only · Requires store coordinates, service zones, demand geography and delivery performance data.</div>
+        <div class="grid g4"><div class="box kpi"><div class="label">Stores in sample network</div><div class="val">50</div><div class="delta">Illustrative</div></div><div class="box kpi"><div class="label">High-overlap pairs</div><div class="val">6</div><div class="delta">Illustrative</div></div><div class="box kpi"><div class="label">Underserved demand pockets</div><div class="val">4</div><div class="delta">Illustrative</div></div><div class="box kpi"><div class="label">Expansion candidates</div><div class="val">3</div><div class="delta">Requires validation</div></div></div>
+        <div class="grid g21 mt"><div class="box"><h3>Catchment and store coverage</h3><div class="ph" style="min-height:260px">Map layer placeholder · Store points · Delivery catchments · Demand density · Overlap zones</div></div><div class="box"><h3>Network decisions to evaluate</h3><ul><li>Can a nearby store absorb demand from an underutilised store?</li><li>Do service zones overlap without improving customer coverage?</li><li>Are there demand pockets with poor service coverage?</li><li>Would a new location improve economics after cannibalisation?</li></ul></div></div>
+        <div class="box mt scroll"><h3>Location decision scorecard</h3><table><thead><tr><th>Area / store pair</th><th>Demand density</th><th>Current coverage</th><th>Overlap risk</th><th>Investment</th><th>Recommendation</th></tr></thead><tbody><tr><td>HSR #412 / Agara #415</td><td>High</td><td>Strong</td><td><span class="pill red">High</span></td><td>Low / operational</td><td>Test zone and capacity balancing</td></tr><tr><td>Area candidate B</td><td>High</td><td>Low</td><td>Low</td><td>To estimate</td><td>Validate new-store feasibility</td></tr><tr><td>Kondapur #233</td><td>Medium</td><td>Strong</td><td>Medium</td><td>Low</td><td>Improve demand utilisation first</td></tr></tbody></table></div>
+      </section>
+
+      <!-- SOLUTION 6: PRODUCT MIX -->
+      <section class="screen" id="s-productmix">
+        <h1>Product mix intelligence</h1>
+        <p class="sub">Understand which categories and SKUs contribute to healthy basket economics, and where assortment changes can improve customer value and margin.</p>
+        <div class="demo-banner">Illustrative category figures · Requires SKU sales, price, cost, discount, returns and promotion data.</div>
+        <div class="grid g4"><div class="box kpi"><div class="label">Average basket value</div><div class="val">₹731</div><div class="delta">Illustrative sample</div></div><div class="box kpi"><div class="label">Categories analysed</div><div class="val">12</div><div class="delta">Illustrative</div></div><div class="box kpi"><div class="label">Low-contribution SKUs</div><div class="val">84</div><div class="delta">Illustrative</div></div><div class="box kpi"><div class="label">Assortment opportunities</div><div class="val">23</div><div class="delta">Illustrative</div></div></div>
+        <div class="grid g2 mt"><div class="box"><h3>Category contribution profile</h3><div class="scorebar"><span>Staples</span><div class="track"><span style="width:72%"></span></div><b>72</b></div><div class="scorebar"><span>Fruits & veg</span><div class="track"><span style="width:48%"></span></div><b>48</b></div><div class="scorebar"><span>Snacks</span><div class="track"><span style="width:84%"></span></div><b>84</b></div><div class="scorebar"><span>Personal care</span><div class="track"><span style="width:91%"></span></div><b>91</b></div><p class="note">Illustrative relative contribution index, not a reported margin.</p></div><div class="box"><h3>Assortment recommendations</h3><ul><li>Identify products with strong demand and positive contribution.</li><li>Review discounts that increase volume but reduce contribution.</li><li>Find basket-complement products and category gaps by neighbourhood.</li><li>Separate margin improvement from price increases that may harm conversion.</li></ul></div></div>
+        <div class="box mt scroll"><h3>SKU and category opportunities</h3><table><thead><tr><th>Category</th><th>Sales trend</th><th>Contribution trend</th><th>Availability</th><th>Opportunity</th><th>Decision</th></tr></thead><tbody><tr><td>Snacks & drinks</td><td>Growing</td><td>Strong</td><td>Good</td><td>Expand relevant assortment</td><td>Test selected SKUs</td></tr><tr><td>Fruits & vegetables</td><td>Growing</td><td>Under pressure</td><td>Variable</td><td>Review sourcing and wastage</td><td>Analyse SKU economics</td></tr><tr><td>Staples</td><td>Stable</td><td>Low per unit</td><td>Good</td><td>Basket attachment</td><td>Bundle / cross-sell test</td></tr></tbody></table></div>
+      </section>
+
+      <!-- 2 PRIORITY -->
+      <section class="screen" id="s-priority">
+        <h1>Priority list</h1>
+        <p class="sub">Stores below break-even, ranked by how much they lose each day. Start at the top.</p><div class="demo-banner">Illustrative demo records — do not interpret these as Swiggy live store data.</div>
+        <div class="filters">
+          <select class="ctl" aria-label="City filter"><option>All cities</option><option>Bengaluru</option><option>Hyderabad</option></select>
+          <select class="ctl" aria-label="Cause filter"><option>All causes</option><option>Stock-out</option><option>Picking queue</option><option>Weak demand</option><option>Overlap</option></select>
+          <select class="ctl" aria-label="Confidence filter"><option>Any confidence</option><option>High</option><option>Medium</option><option>Low</option></select>
+          <select class="ctl" aria-label="Status filter"><option>Any status</option><option>New</option><option>Under review</option><option>Fix running</option><option>Resolved</option></select>
+          <input class="ctl" type="search" placeholder="Search store ID or area" aria-label="Search">
+        </div>
+        <p class="note"><span class="n">1</span>–<span class="n">5</span> Filters. Every column below is sortable.</p>
+        <div class="box scroll mt">
+          <table id="prio"></table>
+        </div>
+        <p class="note">Red rows lose the most. Young stores (under 6 months) get a “ramping” tag so they aren’t mistaken for broken ones.</p>
+      </section>
+
+      <!-- 3 STORE DETAIL -->
+      <section class="screen" id="s-store">
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between">
+          <div>
+            <h1><span class="n">1</span>#412 HSR Layout</h1>
+            <p class="sub" style="margin-bottom:0">Bengaluru, 4,100 sq ft, open 7 months. <span class="pill"><span class="n" style="width:16px;height:16px;font-size:9px">2</span>New</span></p>
+          </div>
+          <span class="fresh"><span class="n">3</span>Last updated today, 6:00 AM</span>
+        </div>
+
+        <div class="section">
+          <h2>Economics <span class="tag">Section B</span></h2>
+          <div class="grid g21">
+            <div class="box">
+              <h3><span class="n">12</span>Orders per day, last 90 days</h3>
+              <div id="storeTrend"></div>
+              <div class="legend"><span><i></i>Orders/day</span><span><i class="dash"></i>Break-even (760)</span></div>
+            </div>
+            <div class="box">
+              <dl class="kv">
+                <dt><span class="n">4</span>Fixed cost per day</dt><dd>₹60,800</dd>
+                <dt><span class="n">5</span>Contribution per order</dt><dd>₹80</dd>
+                <dt><span class="n">6</span>Break-even orders/day</dt><dd>760</dd>
+                <dt><span class="n">7</span>Actual orders/day</dt><dd>610</dd>
+                <dt><span class="n">8</span>Gap to break-even</dt><dd class="loss">–150</dd>
+                <dt><span class="n">9</span>Daily P&amp;L</dt><dd class="loss">–₹12,000</dd>
+                <dt><span class="n">10</span>Monthly P&amp;L</dt><dd class="loss">–₹3.6L</dd>
+              </dl>
+              <div style="margin-top:14px;font-size:13px;color:var(--muted)"><span class="n">11</span>80% of the way to break-even</div>
+              <div class="progress"><span style="width:80%"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Compared with similar stores <span class="tag">Section C</span></h2>
+          <div class="box">
+            <p style="margin:0 0 12px;font-size:14px"><span class="n">13</span>Peers: #389, #401, #415, #430 (same city, size 3,800–4,500 sq ft, open 5–10 months)</p>
+            <div class="cmp">
+              <span class="h"><span class="n">14</span>Metric</span><span class="h">This store</span><span class="h">Peer average</span>
+              <span>Orders/day</span><span class="bad">610</span><span>1,010</span>
+              <span>Evening pick time</span><span class="bad">9.5 min</span><span>4.2 min</span>
+              <span>Busy-mode minutes</span><span class="bad">85/day</span><span>10/day</span>
+              <span>Out-of-stock rate</span><span>2.1%</span><span>2.4%</span>
+              <span>App sessions/1k homes</span><span>142</span><span>150</span>
+              <span>AOV</span><span>₹731</span><span>₹746</span>
+            </div>
+            <p class="note"><span class="n">15</span>Red = clearly worse than peers. <span class="n">16</span>Grey = normal. Demand and stock look fine; operations don’t.</p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Competition nearby <span class="tag">New</span></h2>
+          <div class="box">
+            <div class="grid g4">
+              <div class="kpi"><div class="label">Rival stores within 3 km</div><div class="val" style="font-size:24px">7</div></div>
+              <div class="kpi"><div class="label">Basket vs cheapest rival</div><div class="val loss" style="font-size:24px">+3.8%</div><div class="delta">We’re costlier</div></div>
+              <div class="kpi"><div class="label">Fastest rival promise</div><div class="val" style="font-size:24px">9 min</div><div class="delta">Ours: 12 min at 7–9 PM</div></div>
+              <div class="kpi"><div class="label">Newest rival</div><div class="val" style="font-size:24px">600 m</div><div class="delta">Opened 15 Sep</div></div>
+            </div>
+            <a href="#competition" class="btn ghost" style="display:inline-block;margin-top:12px;text-decoration:none">Open competitor analysis</a>
+            <p class="note">A short summary here. The full comparison for this location lives on its own screen.</p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Diagnosis <span class="tag">Section D</span></h2>
+          <div class="grid g21">
+            <div class="box">
+              <h3><span class="n">17</span>Picking queue at peak hours <span class="pill high">High confidence</span></h3>
+              <p class="note" style="margin-top:4px"><span class="n">18</span>Score for each possible cause</p>
+              <div class="scorebar"><span>Picking queue</span><div class="track"><span class="hot" style="width:86%"></span></div><b>0.86</b></div>
+              <div class="scorebar"><span>Weak demand</span><div class="track"><span style="width:22%"></span></div><b>0.22</b></div>
+              <div class="scorebar"><span>Stock-out</span><div class="track"><span style="width:18%"></span></div><b>0.18</b></div>
+              <div class="scorebar"><span>Overlap</span><div class="track"><span style="width:10%"></span></div><b>0.10</b></div>
+              <div class="scorebar"><span>Competitor pressure</span><div class="track"><span style="width:30%"></span></div><b>0.30</b></div>
+              <h3 style="margin-top:16px"><span class="n">22</span>Evidence</h3>
+              <ul style="margin:0;padding-left:18px;font-size:14px">
+                <li>Pick time doubles between 7 and 9 p.m.</li>
+                <li>Store pauses orders for about 85 min a day</li>
+                <li>Demand and stock are in line with peers</li>
+              </ul>
+            </div>
+            <div class="grid">
+              <div class="box">
+                <h3><span class="n">19</span>Pick time by hour (min)</h3>
+                <div id="pickChart"></div>
+                <div class="axis"><span>8 AM</span><span>12 PM</span><span>4 PM</span><span>8 PM</span><span>12 AM</span></div>
+                <div class="legend"><span><i></i>This store</span><span><i style="background:var(--line)"></i>Peer average</span><span>Shaded: 7–9 PM</span></div>
+              </div>
+              <div class="grid g2">
+                <div class="box"><h3><span class="n">20</span>Queue length by hour</h3><div id="queueChart"></div></div>
+                <div class="box"><h3><span class="n">21</span>Busy-mode min/day</h3><div id="busyChart"></div></div>
+              </div>
+            </div>
+          </div>
+          <p class="note">These evidence charts change with the cause. Stock-out → hour × day heatmap and top missing items. Weak demand → sessions per household vs peers. Overlap → mini-map of the shared catchment.</p>
+        </div>
+
+        <div class="section">
+          <h2>AI brief <span class="tag">Section E</span></h2>
+          <div class="box">
+            <p class="brief"><span class="n">23</span>Store #412 is losing about ₹12,000 a day and is 150 orders short of break-even. Its demand and stock availability are in line with similar stores, but pick time doubles between 7 and 9 p.m. and the store pauses orders for around 85 minutes a day. Adding one picker in that window is the cheapest fix to test first.</p>
+            <div class="sources" id="sources">Sources: economics (store costs, Oct), operations table (hourly pick time and busy mode, 1–28 Oct), peer group #389 #401 #415 #430.</div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <button class="btn ghost" type="button" id="srcBtn"><span class="n">24</span>Show sources</button>
+              <button class="btn ghost" type="button"><span class="n">25</span>Regenerate</button>
+            </div>
+            <p class="note">Every number here comes from the analysis tools. The AI only writes the explanation.</p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Fix options <span class="tag">Section F</span></h2>
+          <div class="grid g3">
+            <div class="box fix rec">
+              <div class="head"><h3 style="margin:0"><span class="n">26</span>Peak-hour picker (7–9 PM)</h3><span class="pill high"><span class="n" style="width:16px;height:16px;font-size:9px">34</span>Recommended</span></div>
+              <dl class="kv">
+                <dt><span class="n">27</span>Daily cost</dt><dd>₹1,500</dd>
+                <dt><span class="n">28</span>Expected uplift</dt><dd>+120 to +200 orders</dd>
+                <dt><span class="n">29</span>New daily P&amp;L</dt><dd>–₹3,900 to +₹2,500</dd>
+                <dt><span class="n">30</span>Payback</dt><dd>Immediate</dd>
+                <dt><span class="n">31</span>Time to effect</dt><dd>1 day</dd>
+                <dt><span class="n">32</span>Risk</dt><dd>Low</dd>
+              </dl>
+              <details><summary><span class="n">33</span>Assumptions</summary>The evening queue is the only bottleneck. Picker cost ₹750 per hour. Uplift range based on 6 past picker tests.</details>
+            </div>
+            <div class="box fix">
+              <div class="head"><h3 style="margin:0">Re-layout pick path</h3></div>
+              <dl class="kv">
+                <dt>Daily cost</dt><dd>₹300 + ₹40k once</dd>
+                <dt>Expected uplift</dt><dd>+60 to +100 orders</dd>
+                <dt>New daily P&amp;L</dt><dd>–₹7,500 to –₹4,300</dd>
+                <dt>Payback</dt><dd>~2 months</dd>
+                <dt>Time to effect</dt><dd>2 weeks</dd>
+                <dt>Risk</dt><dd>Medium</dd>
+              </dl>
+              <details><summary>Assumptions</summary>Fast-moving items moved near packing. Store stays open during the change.</details>
+            </div>
+            <div class="box fix">
+              <div class="head"><h3 style="margin:0">Relocate store</h3></div>
+              <dl class="kv">
+                <dt>Daily cost</dt><dd>₹25L once</dd>
+                <dt>Expected uplift</dt><dd>Uncertain</dd>
+                <dt>New daily P&amp;L</dt><dd>Unknown</dd>
+                <dt>Payback</dt><dd>2+ years</dd>
+                <dt>Time to effect</dt><dd>3 months</dd>
+                <dt>Risk</dt><dd>High</dd>
+              </dl>
+              <details><summary>Assumptions</summary>Shown for comparison. Doesn’t address the queue, which is the diagnosed cause.</details>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Decision <span class="tag">Section G</span></h2>
+          <div class="box">
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <button class="btn ok" type="button" data-decide="Approved"><span class="n">35</span>Approve</button>
+              <button class="btn no" type="button" data-decide="Rejected"><span class="n">36</span>Reject</button>
+              <button class="btn ghost" type="button" data-decide="Sent back for changes"><span class="n">37</span>Modify</button>
+            </div>
+            <label style="display:block;margin-top:12px;font-size:13px;color:var(--muted)"><span class="n">38</span>Comment (required when rejecting)
+              <input class="ctl" style="width:100%;margin-top:4px" placeholder="Why this decision?">
+            </label>
+            <div id="decisionMsg" style="margin-top:10px;font-weight:600"></div>
+            <h3 style="margin-top:16px"><span class="n">39</span>Decision history</h3>
+            <p style="margin:0;font-size:14px;color:var(--muted)">No decisions on this store yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 MAP -->
+      <section class="screen" id="s-map">
+        <h1>Map view</h1>
+        <p class="sub">Where stores are, how they’re doing, and where their delivery zones overlap.</p>
+        <div class="box">
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:14px">
+            <label><input type="checkbox" checked> <span class="n">4</span>Catchment outlines</label>
+            <label><input type="checkbox" checked> <span class="n">5</span>Overlap shading</label>
+            <label><input type="checkbox"> <span class="n">6</span>Demand heatmap</label>
+          </div>
+          <div class="scroll"><div id="mapSvg" style="min-width:560px"></div></div>
+          <div class="legend"><span><span class="n">9</span><i class="green"></i>Profitable</span><span><i style="background:#C99A2E"></i>Near break-even</span><span><i class="red"></i>Losing</span><span>Dot size = orders/day</span></div>
+          <p class="note"><span class="n">7</span>Hover a dot to see store, orders, P&amp;L and cause. <span class="n">8</span>Click to open Store Detail. #412 and #415 share about 40% of their zone.</p>
+        </div>
+      </section>
+
+      <!-- 5 SIMULATOR -->
+      <section class="screen" id="s-simulator">
+        <h1>What-if simulator</h1>
+        <p class="sub">Change the numbers and see whether the store crosses break-even.</p>
+        <div class="grid g2">
+          <div class="box">
+            <label class="slider" style="margin-bottom:18px"><span><span class="n">1</span>Store</span><span></span>
+              <select class="ctl" style="grid-column:1/-1"><option>#412 HSR Layout</option><option>#233 Kondapur</option></select></label>
+            <div class="slider"><label for="sOrders"><span class="n">2</span>Orders per day</label><output id="oOrders"></output><input type="range" id="sOrders" min="300" max="1500" step="10" value="610"></div>
+            <div class="slider"><label for="sContrib"><span class="n">3</span>Contribution per order (₹)</label><output id="oContrib"></output><input type="range" id="sContrib" min="40" max="140" step="1" value="80"></div>
+            <div class="slider"><label for="sRent"><span class="n">4</span>Rent per day (₹)</label><output id="oRent"></output><input type="range" id="sRent" min="10000" max="45000" step="500" value="25000"></div>
+            <div class="slider"><label for="sStaff"><span class="n">5</span>Staff cost per day (₹)</label><output id="oStaff"></output><input type="range" id="sStaff" min="15000" max="50000" step="500" value="30000"></div>
+            <div class="slider"><label for="sPicker"><span class="n">6</span>Extra picker cost (₹/day)</label><output id="oPicker"></output><input type="range" id="sPicker" min="0" max="5000" step="100" value="1500"></div>
+            <div class="slider"><label for="sUplift"><span class="n">7</span>Expected uplift</label><output id="oUplift"></output><input type="range" id="sUplift" min="0" max="60" step="1" value="25"></div>
+            <p class="note">Utilities and other fixed costs are held at ₹5,800/day.</p>
+          </div>
+          <div class="grid">
+            <div class="grid g2">
+              <div class="box kpi"><div class="label"><span class="n">8</span>New break-even</div><div class="big" id="rBE"></div></div>
+              <div class="box kpi"><div class="label"><span class="n">9</span>New orders/day</div><div class="big" id="rOrders"></div></div>
+              <div class="box kpi"><div class="label"><span class="n">10</span>New daily P&amp;L</div><div class="big" id="rPnl"></div></div>
+              <div class="box kpi"><div class="label"><span class="n">11</span>Change vs today</div><div class="big" id="rDelta"></div><div class="delta" id="rMonth"></div></div>
+            </div>
+            <div class="box">
+              <h3><span class="n">13</span>Daily P&amp;L vs orders per day</h3>
+              <div id="simChart"></div>
+              <div class="legend"><span><i></i>P&amp;L line</span><span>○ Today</span><span>● With fix</span><span>Line crosses zero at break-even</span></div>
+              <button class="btn ghost" type="button" style="margin-top:10px"><span class="n">14</span>Save as fix option</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 APPROVALS -->
+      <section class="screen" id="s-approvals">
+        <h1>Approvals</h1>
+        <p class="sub"><span class="n">1</span>7 fixes waiting for a decision.</p>
+        <div class="box scroll">
+          <table>
+            <thead><tr><th><input type="checkbox" aria-label="Select all"> <span class="n">9</span></th><th><span class="n">2</span>Store</th><th><span class="n">3</span>Proposed fix</th><th class="r"><span class="n">4</span>Cost/day</th><th class="r"><span class="n">5</span>Expected gain/day</th><th><span class="n">6</span>Confidence</th><th><span class="n">7</span>Proposed by</th><th><span class="n">8</span>Decision</th></tr></thead>
+            <tbody id="approvalRows"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ok" type="button">Approve selected</button><button class="btn ghost" type="button"><span class="n">10</span>View decision history</button></div>
+      </section>
+
+      <!-- 7 EXPERIMENTS -->
+      <section class="screen" id="s-experiments">
+        <h1>Experiments</h1>
+        <p class="sub">Did the fix work? Each store is compared with similar stores that didn’t get the fix.</p>
+        <div class="grid g3">
+          <div class="box kpi"><div class="label"><span class="n">16</span>Money recovered</div><div class="val gain">₹1.4L/day</div><div class="delta">Across 9 fixes</div></div>
+          <div class="box kpi"><div class="label"><span class="n">18</span>Stores moved above break-even</div><div class="val">6</div></div>
+          <div class="box kpi"><div class="label"><span class="n">17</span>Success rate by fix type</div>
+            <div class="scorebar" style="grid-template-columns:100px 1fr 40px"><span>Picker</span><div class="track"><span style="width:80%"></span></div><b>80%</b></div>
+            <div class="scorebar" style="grid-template-columns:100px 1fr 40px"><span>Restock</span><div class="track"><span style="width:70%"></span></div><b>70%</b></div>
+            <div class="scorebar" style="grid-template-columns:100px 1fr 40px"><span>Marketing</span><div class="track"><span style="width:40%"></span></div><b>40%</b></div>
+          </div>
+        </div>
+        <div class="box scroll mt">
+          <table>
+            <thead><tr><th><span class="n">1</span>Store</th><th><span class="n">2</span>Fix</th><th><span class="n">3</span>Started</th><th class="r"><span class="n">4</span>Days</th><th><span class="n">5</span>Status</th><th class="r"><span class="n">6</span>Expected</th><th class="r"><span class="n">7</span>Actual</th><th><span class="n">8</span>Verdict</th></tr></thead>
+            <tbody>
+              <tr><td>#412 HSR Layout</td><td>Peak-hour picker</td><td>1 Nov</td><td class="r">21</td><td>Running</td><td class="r">+20–33%</td><td class="r">+24%</td><td><span class="pill green">Working</span></td></tr>
+              <tr><td>#118 Andheri E</td><td>Evening restock</td><td>20 Oct</td><td class="r">33</td><td>Completed</td><td class="r">+8–15%</td><td class="r">+11%</td><td><span class="pill green">Working</span></td></tr>
+              <tr><td>#233 Kondapur</td><td>Local marketing</td><td>15 Oct</td><td class="r">38</td><td>Completed</td><td class="r">+5–12%</td><td class="r">+1%</td><td><span class="pill red">Not working</span></td></tr>
+              <tr><td>#415 Agara</td><td>Zone redraw</td><td>18 Nov</td><td class="r">4</td><td>Running</td><td class="r">+5–10%</td><td class="r">—</td><td><span class="pill low">Too early</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="grid g21 mt">
+          <div class="box">
+            <h3><span class="n">9</span>#412: this store vs control stores</h3>
+            <div id="didChart"></div>
+            <div class="axis"><span>1 Oct</span><span>Fix started 1 Nov</span><span>21 Nov</span></div>
+            <div class="legend"><span><i style="background:var(--ink)"></i>#412 (with fix)</span><span><i style="background:var(--line)"></i>Control stores (scaled)</span></div>
+            <p class="note">The gap that opens after the start date is the real effect of the fix. The control line removes seasonality.</p>
+          </div>
+          <div class="box">
+            <dl class="kv">
+              <dt><span class="n">10</span>Orders before → after</dt><dd>610 → 790</dd>
+              <dt>Peers before → after</dt><dd>1,010 → 1,030</dd>
+              <dt><span class="n">11</span>True uplift</dt><dd>+160/day</dd>
+              <dt><span class="n">12</span>P&amp;L before → after</dt><dd>–₹12,000 → +₹1,400</dd>
+              <dt><span class="n">13</span>Fix cost</dt><dd>₹1,500/day</dd>
+              <dt><span class="n">14</span>Net gain</dt><dd class="gain">₹11,900/day</dd>
+            </dl>
+            <div style="display:flex;gap:8px;margin-top:14px"><button class="btn ok" type="button"><span class="n">15</span>Make permanent</button><button class="btn ghost" type="button">Stop</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9 COMPETITION -->
+      <section class="screen" id="s-competition">
+        <h1>Competitor analysis</h1>
+        <p class="sub">How rival quick-commerce stores around one location compare on what customers pay, delivery speed and estimated store costs.</p>
+        <div class="filters">
+          <select class="ctl" aria-label="Location"><option>#412 HSR Layout, Bengaluru</option><option>#415 Agara, Bengaluru</option><option>#233 Kondapur, Hyderabad</option></select>
+          <select class="ctl" aria-label="Radius"><option>Within 2 km</option><option selected>Within 3 km</option><option>Within 5 km</option></select>
+          <span class="fresh" style="align-self:center">Prices checked 27 Oct, 7 PM. Figures marked “est.” are estimates.</span>
+        </div>
+        <p class="note"><span class="n">1</span>Pick a store location and radius. <span class="n">2</span>Competitors are shown as A, B, C in this wireframe; the real product would name them.</p>
+
+        <div class="grid g4 mt">
+          <div class="box kpi"><div class="label"><span class="n">3</span>Rival stores within 3 km</div><div class="val">7</div><div class="delta">A: 3, B: 3, C: 1</div></div>
+          <div class="box kpi"><div class="label"><span class="n">4</span>Basket vs cheapest rival</div><div class="val loss">+3.8%</div><div class="delta">Same 20 everyday items</div></div>
+          <div class="box kpi"><div class="label"><span class="n">5</span>Delivery promise, 7–9 PM</div><div class="val">12 min</div><div class="delta">Fastest rival: 9 min (B)</div></div>
+          <div class="box kpi"><div class="label"><span class="n">6</span>New rival stores, 90 days</div><div class="val">1</div><div class="delta">B, 600 m away, opened 15 Sep</div></div>
+        </div>
+
+        <div class="grid g21 mt">
+          <div class="box">
+            <h3><span class="n">7</span>Rival stores around #412</h3>
+            <div class="scroll"><svg class="chart" viewBox="0 0 600 340" role="img" aria-label="Map of competitor stores around store 412" style="min-width:480px">
+              <rect width="600" height="340" fill="var(--sunk)" rx="6"/>
+              <circle cx="300" cy="170" r="150" fill="none" stroke="var(--line)" stroke-dasharray="5 5"/>
+              <circle cx="300" cy="170" r="100" fill="none" stroke="var(--line)" stroke-dasharray="5 5"/>
+              <circle cx="300" cy="170" r="50" fill="none" stroke="var(--line)" stroke-dasharray="5 5"/>
+              <text x="455" y="174" font-size="11" fill="var(--muted)" font-family="Archivo, sans-serif">3 km</text>
+              <text x="405" y="174" font-size="11" fill="var(--muted)" font-family="Archivo, sans-serif">2 km</text>
+              <text x="355" y="174" font-size="11" fill="var(--muted)" font-family="Archivo, sans-serif">1 km</text>
+              <circle cx="300" cy="170" r="11" fill="var(--loss)" stroke="var(--surface)" stroke-width="2"/>
+              <text x="300" y="150" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)" font-family="Archivo, sans-serif">#412 (us)</text>
+              <g font-family="Archivo, sans-serif" font-size="11" fill="var(--ink)">
+                <rect x="322" y="196" width="16" height="16" fill="var(--ink)"/><text x="342" y="209">B1 (new)</text>
+                <rect x="212" y="100" width="14" height="14" fill="var(--fill-strong)"/><text x="180" y="94">A1</text>
+                <rect x="380" y="80" width="14" height="14" fill="var(--fill-strong)"/><text x="398" y="92">A2</text>
+                <rect x="170" y="240" width="14" height="14" fill="var(--fill-strong)"/><text x="188" y="252">A3</text>
+                <rect x="420" y="250" width="14" height="14" fill="var(--ink)"/><text x="438" y="262">B2</text>
+                <rect x="250" y="290" width="14" height="14" fill="var(--ink)"/><text x="268" y="302">B3</text>
+                <rect x="440" y="40" width="14" height="14" fill="none" stroke="var(--ink)" stroke-width="2"/><text x="458" y="52">C1</text>
+              </g>
+            </svg></div>
+            <div class="legend"><span>● Our store</span><span>▪ Competitor store (shade = brand)</span><span>Rings: 1, 2, 3 km</span></div>
+          </div>
+          <div class="box">
+            <h3><span class="n">8</span>Recent rival moves</h3>
+            <dl class="kv" style="grid-template-columns:auto 1fr;font-variant-numeric:normal">
+              <dt>15 Sep</dt><dd style="text-align:left;font-weight:400">B opened store B1, 600 m away</dd>
+              <dt>1 Oct</dt><dd style="text-align:left;font-weight:400">A cut free-delivery threshold to ₹199</dd>
+              <dt>20 Oct</dt><dd style="text-align:left;font-weight:400">C ran festive discounts on electronics</dd>
+              <dt>25 Oct</dt><dd style="text-align:left;font-weight:400">B started a 9-minute promise in this area</dd>
+            </dl>
+            <div style="margin-top:14px"><h3><span class="n">9</span>Our orders around B1’s opening</h3><div id="compImpact"></div><div class="axis"><span>1 Sep</span><span>B1 opens</span><span>Today</span></div></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>What customers pay <span class="tag">Measured</span></h2>
+          <div class="box scroll">
+            <table>
+              <thead><tr><th><span class="n">10</span>Item</th><th class="r">Us (#412)</th><th class="r">Competitor A</th><th class="r">Competitor B</th><th class="r">Competitor C</th></tr></thead>
+              <tbody>
+                <tr><td>20-item everyday basket</td><td class="r">₹1,452</td><td class="r">₹1,421</td><td class="r"><span class="pill green">₹1,399</span></td><td class="r">₹1,468</td></tr>
+                <tr><td>Delivery fee (below threshold)</td><td class="r">₹30</td><td class="r">₹25</td><td class="r"><span class="pill green">₹0</span></td><td class="r">₹35</td></tr>
+                <tr><td>Free delivery above</td><td class="r">₹299</td><td class="r">₹199</td><td class="r"><span class="pill green">₹149</span></td><td class="r">₹299</td></tr>
+                <tr><td>Handling fee</td><td class="r">₹9</td><td class="r">₹11</td><td class="r"><span class="pill green">₹6</span></td><td class="r">₹9</td></tr>
+                <tr><td>Small-cart fee</td><td class="r">₹20 below ₹99</td><td class="r">₹15 below ₹99</td><td class="r"><span class="pill green">None</span></td><td class="r">₹25 below ₹149</td></tr>
+                <tr><td>Delivery promise, 7–9 PM</td><td class="r">12 min</td><td class="r">10 min</td><td class="r"><span class="pill green">9 min</span></td><td class="r">14 min</td></tr>
+                <tr><td>Top 50 items in stock</td><td class="r"><span class="pill green">96%</span></td><td class="r">94%</td><td class="r">91%</td><td class="r">89%</td></tr>
+                <tr><td><b>Total paid for a ₹250 cart</b></td><td class="r"><b>₹289</b></td><td class="r"><b>₹261</b></td><td class="r"><span class="pill green"><b>₹256</b></span></td><td class="r"><b>₹294</b></td></tr>
+              </tbody>
+            </table>
+            <p class="note"><span class="n">11</span>Green = best in the area. The last row is what a customer actually compares: cart value plus every fee.</p>
+          </div>
+          <div class="box mt scroll">
+            <h3><span class="n">12</span>Price gap by category vs cheapest rival</h3>
+            <table>
+              <thead><tr><th>Category</th><th class="r">Our price gap</th><th>Cheapest rival</th></tr></thead>
+              <tbody>
+                <tr><td>Fruits &amp; vegetables</td><td class="r"><span class="pill red">+6.1%</span></td><td>B</td></tr>
+                <tr><td>Personal care</td><td class="r"><span class="pill red">+5.0%</span></td><td>A</td></tr>
+                <tr><td>Staples</td><td class="r"><span class="pill red">+2.2%</span></td><td>B</td></tr>
+                <tr><td>Dairy &amp; bread</td><td class="r">+0.4%</td><td>A</td></tr>
+                <tr><td>Snacks &amp; drinks</td><td class="r"><span class="pill green">−1.5%</span></td><td>Us</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Estimated rival store costs <span class="tag">Estimates</span></h2>
+          <div class="box scroll">
+            <table>
+              <thead><tr><th><span class="n">13</span>Cost item</th><th class="r">Us (#412, actual)</th><th class="r">A1 (est.)</th><th class="r">B1 (est.)</th><th>How we estimate</th><th>Confidence</th></tr></thead>
+              <tbody>
+                <tr><td>Store size</td><td class="r">4,100 sq ft</td><td class="r">~3,500 sq ft</td><td class="r">~4,000 sq ft</td><td>Field visit, satellite view</td><td><span class="pill high">High</span></td></tr>
+                <tr><td>Rent per day</td><td class="r">₹25,000</td><td class="r">₹19,800–23,300</td><td class="r">₹22,500–26,500</td><td>Area rent ₹170–200/sq ft/month × size</td><td><span class="pill">Medium</span></td></tr>
+                <tr><td>Staff per day</td><td class="r">₹30,000</td><td class="r">₹24,000–28,000</td><td class="r">₹27,000–32,000</td><td>Typical shifts × local wage rates</td><td><span class="pill low">Low</span></td></tr>
+                <tr><td>Utilities and other</td><td class="r">₹5,800</td><td class="r">₹5,000–6,000</td><td class="r">₹5,500–6,500</td><td>Benchmark by store size</td><td><span class="pill">Medium</span></td></tr>
+                <tr><td><b>Fixed cost per day</b></td><td class="r"><b>₹60,800</b></td><td class="r"><b>₹48,800–57,300</b></td><td class="r"><b>₹55,000–65,000</b></td><td>Sum of the above</td><td><span class="pill">Medium</span></td></tr>
+                <tr><td>Break-even orders/day</td><td class="r">760</td><td class="r">610–720</td><td class="r">690–810</td><td>Assumes the same ₹80 per order</td><td><span class="pill low">Low</span></td></tr>
+                <tr><td>Orders per day</td><td class="r">610</td><td class="r">900–1,100</td><td class="r">700–900</td><td>Peak-hour rider pickup counts</td><td><span class="pill low">Low</span></td></tr>
+              </tbody>
+            </table>
+            <p class="note"><span class="n">14</span>Rival costs are never published, so they’re always shown as ranges with a confidence level. A1 looks cheaper to run and busier than us, which explains how A can price lower.</p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>What this means for #412 <span class="tag">AI brief</span></h2>
+          <div class="box">
+            <p class="brief"><span class="n">15</span>Competition is a contributing factor here, not the main cause. B opened a store 600 m away on 15 Sep with free delivery from ₹149 and a 9-minute promise, and #412’s orders dipped about 5% for two weeks before recovering. Our basket is 3.8% costlier, mostly in fruits &amp; vegetables. The bigger issue is still the evening picking queue: it stretches our delivery to 12 minutes exactly when B is fastest, so fixing the queue also closes most of the speed gap.</p>
+            <h3 style="margin-top:16px"><span class="n">16</span>Suggested responses</h3>
+            <div class="scroll"><table>
+              <thead><tr><th>Response</th><th class="r">Cost/day</th><th>Effect</th><th>Note</th></tr></thead>
+              <tbody>
+                <tr><td>Fix evening picking queue</td><td class="r">₹1,500</td><td>Delivery back to ~9–10 min</td><td>Already the recommended fix</td></tr>
+                <tr><td>Review fruit &amp; veg prices in this zone</td><td class="r">Margin cost</td><td>Closes the biggest price gap</td><td>Check against contribution first</td></tr>
+                <tr><td>Test ₹199 free-delivery threshold</td><td class="r">~₹2,000</td><td>Matches A, not B</td><td>Avoid matching deep discounts</td></tr>
+              </tbody>
+            </table></div>
+            <div style="display:flex;gap:8px;margin-top:12px"><a href="#store" class="btn ghost" style="text-decoration:none">Back to #412</a><button class="btn ghost" type="button">Add response as fix option</button></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Where the data comes from</h2>
+          <div class="box scroll">
+            <table>
+              <thead><tr><th><span class="n">17</span>Data</th><th>Source</th><th>Refresh</th><th>Confidence</th></tr></thead>
+              <tbody>
+                <tr><td>Rival store locations</td><td>Delivery checks from sample addresses, field visits</td><td>Weekly</td><td><span class="pill high">High</span></td></tr>
+                <tr><td>Basket prices and fees</td><td>Fixed 20-item basket checked 3 times a day</td><td>Daily</td><td><span class="pill high">High</span></td></tr>
+                <tr><td>Delivery promises</td><td>Same checks, peak and off-peak</td><td>Daily</td><td><span class="pill">Medium</span></td></tr>
+                <tr><td>Rent</td><td>Commercial property listings in the area</td><td>Monthly</td><td><span class="pill">Medium</span></td></tr>
+                <tr><td>Staff cost</td><td>Local wage rates × typical shift plan</td><td>Quarterly</td><td><span class="pill low">Low</span></td></tr>
+                <tr><td>Rival orders/day</td><td>Peak-hour rider pickup counts</td><td>Weekly</td><td><span class="pill low">Low</span></td></tr>
+              </tbody>
+            </table>
+            <p class="note">Check each source’s terms of use before automating data collection.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- 8 ASK AI DRAWER -->
+<aside class="drawer" id="drawer" aria-label="Ask AI">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <h2 style="margin:0">Ask AI</h2>
+    <button class="btn ghost" type="button" id="closeDrawer">Close</button>
+  </div>
+  <div class="msgs">
+    <div class="msg me">Why is #412 worse than #389?</div>
+    <div class="msg">
+      <span class="n">3</span>Both stores are the same size with similar demand. The difference is evening operations: #412’s pick time rises to 9.5 min between 7 and 9 p.m., versus 4.1 min at #389, so #412 pauses orders for about 85 min a day.
+      <div class="ph" style="margin-top:8px;min-height:60px"><span class="n">4</span>Mini chart: pick time by hour, both stores</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:6px"><span class="n">5</span>Data: operations table, 1–28 Oct</div>
+      <a href="#store" style="font-size:13px;display:inline-block;margin-top:6px"><span class="n">6</span>Open #412</a>
+    </div>
+  </div>
+  <div class="chips"><span class="n">2</span>
+    <button class="chip" type="button">Which stores have evening stock-outs?</button>
+    <button class="chip" type="button">What if we merge #412 and #415?</button>
+  </div>
+  <div style="display:flex;gap:8px"><input class="ctl" style="flex:1" placeholder="Ask about any store" aria-label="Question"><button class="btn solid" type="button"><span class="n">1</span>Ask</button></div>
+</aside>
+
+<script>
+const fmt = n => n.toLocaleString('en-IN');
+const rupee = n => (n < 0 ? '–₹' : '₹') + fmt(Math.abs(Math.round(n)));
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+/* ---------- tiny chart helpers ---------- */
+function bars(vals, {h=140, hi=null, refY=null, max=null} = {}){
+  const W=600, m = max || Math.max(...vals)*1.1, bw = W/vals.length;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${h}" preserveAspectRatio="none" role="img" aria-label="Bar chart">`;
+  vals.forEach((v,i)=>{
+    const bh = v/m*(h-6);
+    const col = hi && hi(i) ? 'var(--ink)' : 'var(--fill-strong)';
+    s += `<rect x="${i*bw+bw*0.12}" y="${h-bh}" width="${bw*0.76}" height="${bh}" fill="${col}" rx="2"/>`;
+  });
+  if(refY!=null){ const x = refY*W; s += `<line x1="${x}" x2="${x}" y1="0" y2="${h}" stroke="var(--loss)" stroke-width="2.5" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>`; }
+  return s + '</svg>';
+}
+function lines(series, {h=150, min=null, max=null, shade=null, refY=null, vline=null, dots=[]} = {}){
+  const W=600, all = series.flatMap(s=>s.v);
+  const lo = min ?? Math.min(...all)*0.9, hi = max ?? Math.max(...all)*1.1;
+  const y = v => h - (v-lo)/(hi-lo)*(h-8) - 4;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${h}" preserveAspectRatio="none" role="img" aria-label="Line chart">`;
+  if(shade){ const n = series[0].v.length-1; s += `<rect x="${shade[0]/n*W}" y="0" width="${(shade[1]-shade[0])/n*W}" height="${h}" fill="var(--loss-bg)"/>`; }
+  if(refY!=null) s += `<line x1="0" x2="${W}" y1="${y(refY)}" y2="${y(refY)}" stroke="var(--loss)" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>`;
+  if(vline!=null){ const n = series[0].v.length-1; s += `<line x1="${vline/n*W}" x2="${vline/n*W}" y1="0" y2="${h}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>`; }
+  series.forEach(se=>{
+    const n = se.v.length-1;
+    const pts = se.v.map((v,i)=>`${i/n*W},${y(v)}`).join(' ');
+    s += `<polyline points="${pts}" fill="none" stroke="${se.c||'var(--fill-strong)'}" stroke-width="${se.w||2.5}" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;
+  });
+  return s + '</svg>';
+}
+const wobble = (n, base, amp, trend=0, seed=1) => Array.from({length:n},(_,i)=> base + trend*i + Math.sin(i*0.9+seed)*amp + Math.sin(i*0.37+seed*2)*amp*0.6);
+
+/* ---------- data ---------- */
+const stores = [
+  ['#412','HSR Layout','Bengaluru',7,610,760,'Picking queue','High','New'],
+  ['#233','Kondapur','Hyderabad',11,545,690,'Weak demand','Medium','New'],
+  ['#118','Andheri E','Mumbai',14,700,840,'Stock-out','High','Under review'],
+  ['#415','Agara','Bengaluru',5,520,650,'Overlap','High','New'],
+  ['#507','Sector 49','Gurugram',9,640,760,'Stock-out','Medium','Fix running'],
+  ['#301','Velachery','Chennai',4,480,590,'Weak demand','Low','New'],
+  ['#276','Kothrud','Pune',12,690,780,'Picking queue','Medium','Under review'],
+  ['#144','Salt Lake','Kolkata',16,610,690,'Overlap','Medium','New'],
+];
+const confPill = c => `<span class="pill ${c==='High'?'high':c==='Low'?'low':''}">${c}</span>`;
+
+function renderPriority(){
+  const head = `<thead><tr><th class="r"><span class="n">6</span>Rank</th><th><span class="n">7</span>Store</th><th><span class="n">8</span>City</th><th class="r"><span class="n">9</span>Age</th><th class="r"><span class="n">10</span>Orders/day</th><th class="r"><span class="n">11</span>Break-even</th><th class="r"><span class="n">12</span>Gap</th><th class="r"><span class="n">13</span>Daily P&amp;L</th><th><span class="n">14</span>Likely cause</th><th><span class="n">15</span>Confidence</th><th><span class="n">16</span>Status</th><th><span class="n">17</span></th></tr></thead>`;
+  const rows = stores.map((s,i)=>{
+    const gap = s[4]-s[5], pnl = gap*80;
+    const age = s[3] + ' mo' + (s[3] < 6 ? ' <span class="pill low">ramping</span>' : '');
+    return `<tr class="click" data-go="store"><td class="r">${i+1}</td><td><b>${s[0]}</b> ${s[1]}</td><td>${s[2]}</td><td class="r">${age}</td><td class="r">${fmt(s[4])}</td><td class="r">${fmt(s[5])}</td><td class="r loss">${gap}</td><td class="r"><span class="pill red">${rupee(pnl)}</span></td><td>${s[6]}</td><td>${confPill(s[7])}</td><td>${s[8]}</td><td><button class="btn ghost" type="button" style="padding:3px 10px">Open</button></td></tr>`;
+  }).join('');
+  document.getElementById('prio').innerHTML = head + '<tbody>' + rows + '</tbody>';
+  document.getElementById('top5').innerHTML = '<thead><tr><th>Store</th><th class="r">Loss/day</th><th>Cause</th></tr></thead><tbody>' +
+    stores.slice(0,5).map(s=>`<tr class="click" data-go="store"><td><b>${s[0]}</b> ${s[1]}</td><td class="r loss">${rupee((s[4]-s[5])*80)}</td><td>${s[6]}</td></tr>`).join('') + '</tbody>';
+  const appr = [
+    ['#412 HSR Layout','Peak-hour picker',1500,'₹9,600–16,000','High','Ops manager, Bengaluru · 28 Oct'],
+    ['#118 Andheri E','Evening restock run',500,'₹4,500–8,400','High','Ops manager, Mumbai · 28 Oct'],
+    ['#415 Agara','Redraw zone with #412',0,'₹2,100–4,200','High','Network planning · 27 Oct'],
+    ['#233 Kondapur','Local marketing push',3000,'₹2,200–5,200','Medium','Growth team · 27 Oct'],
+    ['#301 Velachery','Wait (store ramping)',0,'—','Low','System · 27 Oct'],
+  ];
+  document.getElementById('approvalRows').innerHTML = appr.map(a=>`<tr><td><input type="checkbox" aria-label="Select ${a[0]}"></td><td>${a[0]}</td><td>${a[1]}</td><td class="r">₹${fmt(a[2])}</td><td class="r">${a[3]}</td><td>${confPill(a[4])}</td><td>${a[5]}</td><td style="display:flex;gap:6px"><button class="btn ok" type="button" style="padding:3px 10px">Approve</button><button class="btn no" type="button" style="padding:3px 10px">Reject</button></td></tr>`).join('');
+}
+
+function renderCharts(){
+  // histogram: orders/day buckets 300..1500
+  document.getElementById('histo').innerHTML = bars([2,4,7,9,8,6,4,3,3,2,1,1], {h:150, refY:0.38});
+  document.getElementById('lossTrend').innerHTML = lines([{v:wobble(45,470,18,-2,3), c:'var(--loss)'}], {h:130, min:300, max:520});
+  document.getElementById('storeTrend').innerHTML = lines([{v:wobble(45,520,25,2.1,2), c:'var(--ink)'}], {h:150, min:350, max:900, refY:760});
+  document.getElementById('utilChart').innerHTML = bars([610,545,700,520,640,480,690,610], {h:150, max:1600, refY:0.48});
+  document.getElementById('opsChart').innerHTML = lines([{v:[4.1,4.0,4.2,4.3,4.4,4.5,4.8,5.0,5.4,6.2,7.8,9.5,9.1,7.4,5.6,4.8],c:'var(--ink)'}], {h:150,min:0,max:11,shade:[10,13]});
+  const hours = 17; // 8am..12am
+  const pick = Array.from({length:hours},(_,i)=> i>=11 && i<=13 ? 8.5+ (i===12?1:0) : 4 + Math.sin(i)*0.4);
+  const peer = Array.from({length:hours},(_,i)=> 4 + Math.sin(i*0.8)*0.3 + (i>=11&&i<=13?0.4:0));
+  document.getElementById('pickChart').innerHTML = lines([{v:peer,c:'var(--line)'},{v:pick,c:'var(--ink)'}], {h:140, min:0, max:11, shade:[11,13]});
+  document.getElementById('queueChart').innerHTML = bars([2,3,3,4,3,4,5,6,5,6,8,15,22,17,6,3,2], {h:90, hi:i=>i>=11&&i<=13});
+  document.getElementById('busyChart').innerHTML = bars([85,10], {h:90, hi:i=>i===0}) + '<div class="axis"><span>This store</span><span>Peers</span></div>';
+  const pre = wobble(31,610,14,0,1), post = wobble(21,700,14,4.5,4);
+  const ctrl = wobble(52,640,10,0.2,6);
+  document.getElementById('didChart').innerHTML = lines([{v:ctrl,c:'var(--line)'},{v:pre.concat(post),c:'var(--ink)'}], {h:160, min:520, max:880, vline:31});
+  const before = wobble(14,640,6,0,2), dip = Array.from({length:14},(_,i)=>608+Math.sin(i)*5), back = wobble(30,612,6,0.1,5);
+  document.getElementById('compImpact').innerHTML = lines([{v:before.concat(dip,back),c:'var(--ink)'}], {h:90, min:560, max:680, vline:14});
+}
+
+function renderMap(){
+  const pts = [
+    {x:120,y:110,r:16,c:'gain',id:'#389'},{x:300,y:90,r:18,c:'gain',id:'#401'},{x:470,y:150,r:13,c:'mid',id:'#430'},
+    {x:250,y:240,r:10,c:'loss',id:'#412'},{x:335,y:265,r:9,c:'loss',id:'#415'},{x:120,y:300,r:14,c:'mid',id:'#388'},
+    {x:520,y:300,r:12,c:'loss',id:'#422'},{x:420,y:370,r:15,c:'gain',id:'#409'}
+  ];
+  const col = c => c==='gain' ? 'var(--gain)' : c==='loss' ? 'var(--loss)' : '#C99A2E';
+  let s = `<svg class="chart" viewBox="0 0 640 430" role="img" aria-label="Store map wireframe">
+    <rect x="0" y="0" width="640" height="430" fill="var(--sunk)" rx="6"/>
+    <path d="M0 200 C150 180 300 230 640 190" stroke="var(--line)" stroke-width="10" fill="none" opacity=".5"/>
+    <path d="M200 0 C220 150 180 300 230 430" stroke="var(--line)" stroke-width="8" fill="none" opacity=".5"/>
+    <path d="M380 0 L400 430" stroke="var(--line)" stroke-width="5" fill="none" opacity=".4"/>`;
+  pts.forEach(p=>{ s += `<circle cx="${p.x}" cy="${p.y}" r="78" fill="none" stroke="var(--fill-strong)" stroke-width="1.5" stroke-dasharray="5 5"/>`; });
+  s += `<clipPath id="cp"><circle cx="250" cy="240" r="78"/></clipPath><circle cx="335" cy="265" r="78" fill="var(--loss)" opacity=".18" clip-path="url(#cp)"/>`;
+  pts.forEach(p=>{ s += `<g style="cursor:pointer" data-go="store"><title>${p.id}: hover shows orders, P&L and cause</title><circle cx="${p.x}" cy="${p.y}" r="${p.r}" fill="${col(p.c)}" stroke="var(--surface)" stroke-width="2"/><text x="${p.x}" y="${p.y - p.r - 6}" text-anchor="middle" font-size="12" fill="var(--ink)" font-family="Archivo, sans-serif">${p.id}</text></g>`; });
+  s += `<text x="292" y="300" font-size="12" fill="var(--loss)" font-family="Archivo, sans-serif">~40% overlap</text></svg>`;
+  document.getElementById('mapSvg').innerHTML = s;
+}
+
+/* ---------- simulator ---------- */
+const OTHER = 5800, TODAY = {orders:610, contrib:80, fixed:60800};
+function sim(){
+  const g = id => +document.getElementById(id).value;
+  const o=g('sOrders'), c=g('sContrib'), r=g('sRent'), st=g('sStaff'), p=g('sPicker'), u=g('sUplift');
+  document.getElementById('oOrders').textContent = fmt(o);
+  document.getElementById('oContrib').textContent = '₹'+c;
+  document.getElementById('oRent').textContent = '₹'+fmt(r);
+  document.getElementById('oStaff').textContent = '₹'+fmt(st);
+  document.getElementById('oPicker').textContent = '₹'+fmt(p);
+  document.getElementById('oUplift').textContent = '+'+u+'%';
+  const fixed = r + st + OTHER + p, be = Math.ceil(fixed/c), no = Math.round(o*(1+u/100));
+  const pnl = no*c - fixed, today = TODAY.orders*TODAY.contrib - TODAY.fixed, d = pnl - today;
+  document.getElementById('rBE').textContent = fmt(be);
+  document.getElementById('rOrders').textContent = fmt(no);
+  const pe = document.getElementById('rPnl'); pe.textContent = rupee(pnl); pe.className = 'big ' + (pnl<0?'loss':'gain');
+  const de = document.getElementById('rDelta'); de.textContent = (d>=0?'+':'') + rupee(d); de.className = 'big ' + (d<0?'loss':'gain');
+  document.getElementById('rMonth').textContent = 'About ' + (d>=0?'+':'') + rupee(d*30) + ' a month';
+  // chart: pnl vs orders 300..1500
+  const W=600,H=170, xo=v=>(v-300)/1200*W, lo=-60000, hi=60000, yv=v=>H-(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*H;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Profit and loss versus orders">`;
+  s += `<rect x="0" y="${yv(0)}" width="${W}" height="${H-yv(0)}" fill="var(--loss-bg)"/>`;
+  s += `<line x1="0" x2="${W}" y1="${yv(0)}" y2="${yv(0)}" stroke="var(--muted)" stroke-width="1"/>`;
+  s += `<line x1="${xo(300)}" y1="${yv(300*c-fixed)}" x2="${xo(1500)}" y2="${yv(1500*c-fixed)}" stroke="var(--fill-strong)" stroke-width="2.5"/>`;
+  if(be>=300 && be<=1500) s += `<line x1="${xo(be)}" x2="${xo(be)}" y1="0" y2="${H}" stroke="var(--loss)" stroke-dasharray="5 4" stroke-width="1.5"/><text x="${xo(be)+5}" y="14" font-size="12" fill="var(--loss)" font-family="Archivo, sans-serif">Break-even ${fmt(be)}</text>`;
+  s += `<circle cx="${xo(TODAY.orders)}" cy="${yv(today)}" r="6" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/>`;
+  if(no>=300 && no<=1500) s += `<circle cx="${xo(no)}" cy="${yv(pnl)}" r="6" fill="var(--ink)"/>`;
+  s += `<text x="4" y="${H-6}" font-size="11" fill="var(--muted)" font-family="Archivo, sans-serif">300 orders</text><text x="${W-4}" y="${H-6}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="Archivo, sans-serif">1,500</text></svg>`;
+  document.getElementById('simChart').innerHTML = s;
+}
+
+/* ---------- routing & interactions ---------- */
+const screens = ['overview','utilisation','inventory','operations','profitability','network','productmix','priority','store','map','simulator','approvals','experiments','competition'];
+function show(name){
+  if(!screens.includes(name)) name = 'overview';
+  screens.forEach(s=>document.getElementById('s-'+s).classList.toggle('on', s===name));
+  document.querySelectorAll('#nav a').forEach(a=>{
+    if(a.dataset.s===name) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+  });
+  window.scrollTo(0,0);
+}
+function fromHash(){ show((location.hash||'').replace('#','')); }
+window.addEventListener('hashchange', fromHash);
+document.addEventListener('click', e=>{
+  const go = e.target.closest('[data-go]');
+  if(go){ location.hash = go.dataset.go; show(go.dataset.go); document.getElementById('drawer').classList.remove('open'); }
+  const nav = e.target.closest('#nav a, a[href^="#"]');
+  if(nav){ const t = nav.getAttribute('href').slice(1); if(screens.includes(t)){ e.preventDefault(); location.hash = t; show(t); document.getElementById('drawer').classList.remove('open'); } }
+  const dec = e.target.closest('[data-decide]');
+  if(dec) document.getElementById('decisionMsg').textContent = dec.dataset.decide + '. Logged to decision history.';
+});
+document.getElementById('notesToggle').addEventListener('change', e=>document.body.classList.toggle('clean', !e.target.checked));
+document.getElementById('srcBtn').addEventListener('click', ()=>document.getElementById('sources').classList.toggle('show'));
+document.getElementById('askBtn').addEventListener('click', ()=>document.getElementById('drawer').classList.add('open'));
+document.getElementById('closeDrawer').addEventListener('click', ()=>document.getElementById('drawer').classList.remove('open'));
+document.querySelectorAll('#s-simulator input[type=range]').forEach(i=>i.addEventListener('input', sim));
+
+renderPriority(); renderCharts(); renderMap(); sim(); fromHash();
+</script>
+</body>
+</html>

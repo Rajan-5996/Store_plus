@@ -1,0 +1,107 @@
+.module-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.module-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;min-height:170px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .2s,transform .2s}
+.module-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.module-card p{font-size:13px;color:var(--muted);margin:0;font-weight:500}
+.module-card .module-icon{font-size:20px;width:40px;height:40px;border-radius:12px;background:var(--salt);color:var(--brand);display:grid;place-items:center}
+.module-card a{margin-top:auto;font-size:14px;font-weight:700;text-decoration:none;color:var(--brand)}
+.callout{padding:12px 14px;border-left:4px solid var(--brand);background:var(--salt);border-radius:var(--r-sm);font-size:13px;font-weight:500}
+@media(max-width:980px){.module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.module-grid{grid-template-columns:1fr}}
+
+.box{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;position:relative}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:1fr 1fr}
+.g21{grid-template-columns:2fr 1fr}
+.mt{margin-top:16px}
+.section{margin-top:28px}
+
+.kpi .label{color:var(--muted);font-size:13px;font-weight:600}
+.kpi .val{font-size:30px;font-weight:800;line-height:1.1;margin-top:6px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi .delta{font-size:13px;color:var(--muted);margin-top:4px;font-weight:500}
+.loss{color:var(--loss)} .gain{color:var(--gain)}
+.pill{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;border:1px solid var(--line);white-space:nowrap}
+.pill.high{background:var(--salt);border-color:transparent;color:var(--brand);font-weight:700}
+.pill.low{color:var(--muted);background:var(--sunk);border-color:transparent}
+.pill.red{background:var(--loss-bg);color:var(--loss);border-color:transparent}
+.pill.green{background:var(--gain-bg);color:var(--gain);border-color:transparent}
+
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line-soft);white-space:nowrap;font-size:14px}
+th{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--line)}
+td.r,th.r{text-align:right}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--salt)}
+
+.chart{width:100%;height:auto;display:block}
+.axis{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:4px;font-weight:500}
+.legend{display:flex;flex-wrap:wrap;gap:14px;color:var(--muted);font-size:12.5px;margin-top:8px;font-weight:500}
+.legend i{display:inline-block;width:14px;height:4px;border-radius:2px;background:var(--fill-strong);vertical-align:middle;margin-right:6px}
+.legend i.dash{background:none;border-top:2px dashed var(--loss);height:0;border-radius:0}
+
+.scorebar{display:grid;grid-template-columns:120px 1fr 42px;gap:10px;align-items:center;font-size:14px;margin:8px 0;font-weight:600}
+.track{height:10px;background:var(--sunk);border-radius:5px;overflow:hidden}
+.track span{display:block;height:100%;border-radius:5px;background:var(--brand)}
+.track span.hot{background:var(--ink)}
+
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px 14px;font-size:14px;font-variant-numeric:tabular-nums}
+.kv dt{color:var(--muted);font-weight:500} .kv dd{margin:0;text-align:right;font-weight:700}
+
+.ph{border:1px dashed var(--line);border-radius:var(--r-sm);background:var(--sunk);display:grid;place-items:center;color:var(--muted);font-size:13px;min-height:80px;padding:10px;text-align:center}
+
+/* Greeting hero (overview) */
+.hero{position:relative;margin-bottom:18px;padding:12px 0 8px}
+.hero > svg{-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 45%),linear-gradient(to bottom,#000 55%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0%,#000 45%),linear-gradient(to bottom,#000 55%,transparent 100%);mask-composite:intersect}
+.hero-body{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px}
+
+.hero-title{display:flex;align-items:center;gap:10px;font-size:34px;margin:0 0 8px}
+.hero-filters{display:flex;flex-wrap:wrap;gap:10px}
+
+/* Subtle, softly tinted KPI cards — each with its own accent colour (set via --kc) */
+.kpi-c{--kc:#6366F1;box-shadow:var(--shadow);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--kc) 15%,var(--surface)) 0%,color-mix(in srgb,var(--kc) 5%,var(--surface)) 100%);
+  border:0}
+.kpi-c .label{color:color-mix(in srgb,var(--kc) 55%,var(--muted))}
+.kpi-c0{--kc:#6366F1}
+.kpi-c1{--kc:#2F80ED}
+.kpi-c2{--kc:#10B981}
+.kpi-c3{--kc:#F43F5E}
+.kpi-c4{--kc:#F59E0B}
+.kpi-c5{--kc:#14B8A6}
+.kpi-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.kpi-ico{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:12px;
+  background:color-mix(in srgb,var(--kc,var(--brand)) 18%,transparent);color:var(--kc,var(--brand))}
+.kpi-ico svg{width:20px;height:20px}
+
+/* ---------- Glass cards with a shine sweep (chart cards + KPI cards) ---------- */
+.box,.kpi-c{
+  isolation:isolate;
+  -webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);
+  box-shadow:inset 0 1px 0 rgba(255,244,236,.95),inset 0 0 22px rgba(255,244,236,.28),0 10px 30px -14px rgba(120,53,15,.28)}
+.box{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--surface) 78%,transparent) 0%,color-mix(in srgb,var(--surface) 52%,transparent) 100%);
+  border:1px solid rgba(255,244,236,.7)}
+.kpi-c{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--kc) 20%,rgba(255,244,236,.55)) 0%,color-mix(in srgb,var(--kc) 7%,rgba(255,244,236,.32)) 100%);
+  border:0}
+/* both effects sit behind the card content (z-index:-1 inside the isolated card) so text stays crisp */
+.box::before,.kpi-c::before{content:"";position:absolute;z-index:-1;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(120% 90% at 0% 0%,rgba(255,244,236,.55) 0%,transparent 55%),linear-gradient(115deg,transparent 42%,rgba(255,244,236,.32) 50%,transparent 58%)}
+.box::after,.kpi-c::after{content:"";position:absolute;z-index:-1;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(115deg,transparent 26%,rgba(255,244,236,.5) 41%,rgba(255,244,236,1) 50%,rgba(255,244,236,.45) 59%,transparent 74%);
+  background-size:260% 100%;background-position:130% 0;background-repeat:no-repeat;opacity:0;transition:opacity .2s}
+.box:hover::after,.kpi-c:hover::after{opacity:1;animation:glass-sweep .95s ease-out}
+/* chart cards also shimmer on their own, staggered so they do not all flash together */
+.box::after{opacity:1;animation:glass-loop 5s ease-out 1s infinite}
+.grid > .box:nth-child(2)::after{animation-delay:2.2s}
+.grid > .box:nth-child(3)::after{animation-delay:3.4s}
+.box:hover::after,.grid > .box:nth-child(n):hover::after{animation:glass-sweep .95s ease-out 0s}
+/* KPI cards also shimmer on their own every few seconds */
+.kpi-c::after{opacity:1;animation:glass-loop 4.5s ease-out .6s infinite}
+.kpi-c:hover::after{animation:glass-sweep .95s ease-out}
+@keyframes glass-sweep{from{background-position:130% 0}to{background-position:-60% 0}}
+@keyframes glass-loop{0%{background-position:130% 0}34%{background-position:-60% 0}100%{background-position:-60% 0}}
+@media (prefers-reduced-motion:reduce){.box::after,.kpi-c::after,.box:hover::after,.kpi-c:hover::after{animation:none}}
+

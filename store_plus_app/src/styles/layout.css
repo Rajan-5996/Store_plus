@@ -1,0 +1,52 @@
+/* Top bar: transparent at the top of the page, fades to solid white as you scroll.
+   --p (0..1) is set by useScrollProgress(). */
+.top{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 28px;
+  background:color-mix(in srgb,var(--surface) calc(var(--p,0) * 100%),transparent);
+  box-shadow:0 1px 0 color-mix(in srgb,var(--line-soft) calc(var(--p,0) * 100%),transparent),0 8px 20px -12px rgba(2,6,12,calc(var(--p,0) * .18))}
+.top .grow{flex:1}
+.ctl{border:1px solid color-mix(in srgb,var(--brand) 28%,transparent);background:color-mix(in srgb,var(--surface) 55%,var(--salt));border-radius:var(--r-sm);padding:8px 12px}
+.btn{border:1px solid color-mix(in srgb,var(--brand) 28%,transparent);background:color-mix(in srgb,var(--surface) 55%,var(--salt));border-radius:var(--r-sm);padding:8px 16px;cursor:pointer;font-weight:700}
+.btn:hover{background:color-mix(in srgb,var(--surface) 35%,var(--salt))}
+.btn.solid{background:var(--btn-dark);border-color:var(--btn-dark);color:var(--btn-dark-ink);transition:background .15s,border-color .15s,color .15s}
+.btn.solid:hover{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.ghost{background:transparent;border-color:color-mix(in srgb,var(--btn-dark) 45%,transparent);color:var(--btn-dark)}
+.btn.ghost:hover{background:var(--btn-dark);border-color:var(--btn-dark);color:var(--btn-dark-ink)}
+.btn.ok{border-color:var(--gain);color:var(--gain)}
+.btn.no{border-color:var(--loss);color:var(--loss)}
+.toggle{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.toggle input{accent-color:var(--brand)}
+
+.page{padding:12px 28px 64px;max-width:1240px;width:100%}
+h1{font-size:30px;line-height:1.15;margin:0 0 6px;font-weight:800;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:0 0 20px;max-width:70ch;font-weight:500}
+h2{font-size:19px;margin:0 0 12px;font-weight:800}
+h3{font-size:16px;margin:0 0 8px;font-weight:700}
+
+/* Top bar search — takes 75% of the bar */
+.top-search{position:relative;flex:0 1 75%;min-width:0}
+.top-search input{width:100%;height:32px;font-size:13.5px;padding:0 14px 0 38px;border:1px solid color-mix(in srgb,var(--brand) 28%,transparent);border-radius:var(--r-sm);background:color-mix(in srgb,var(--surface) 55%,var(--salt));color:var(--ink);font-weight:500;outline:none;box-shadow:none}
+.top-search input::placeholder{color:color-mix(in srgb,var(--brand) 60%,var(--muted));opacity:1}
+.top-search input:focus,.top-search input:focus-visible{outline:none;border-color:color-mix(in srgb,var(--brand) 28%,transparent);box-shadow:none}
+.top-search-icon{position:absolute;left:12px;top:50%;width:18px;height:18px;transform:translateY(-50%);color:var(--brand);pointer-events:none}
+.top-search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;margin:0;padding:6px;list-style:none;background:color-mix(in srgb,var(--surface) 40%,var(--salt));border:1px solid color-mix(in srgb,var(--brand) 22%,transparent);border-radius:var(--radius-sm,10px);box-shadow:var(--shadow-lg);z-index:30}
+.top-search-results button,.top-search-results .empty{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;background:none;border-radius:var(--r-sm);text-align:left;font-weight:600;cursor:pointer}
+.top-search-results .empty{color:var(--muted);cursor:default}
+.top-search-results button:hover{background:color-mix(in srgb,var(--brand) 12%,transparent);color:var(--brand)}
+.top .btn{height:32px;padding:0 14px;font-size:13px;display:inline-flex;align-items:center}
+
+/* Themed filter dropdown — a blend of white and Swiggy peach, never pure white */
+.fs{position:relative}
+.fs-btn{display:flex;align-items:center;gap:8px;height:38px;padding:0 10px 0 12px;min-width:150px;cursor:pointer;font-weight:600;color:var(--ink);
+  border:1px solid color-mix(in srgb,var(--brand) 28%,transparent);border-radius:var(--r-sm);
+  background:color-mix(in srgb,var(--surface) 55%,var(--salt));transition:background .15s,border-color .15s}
+.fs-btn:hover{background:color-mix(in srgb,var(--surface) 35%,var(--salt));border-color:color-mix(in srgb,var(--brand) 45%,transparent)}
+.fs-btn span{flex:1;text-align:left}
+.fs-icon{width:18px;height:18px;color:var(--brand)}
+.fs-chevron{width:20px;height:20px;color:var(--brand);transition:transform .15s}
+.fs-chevron.open{transform:rotate(180deg)}
+.fs-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:100%;z-index:30;margin:0;padding:6px;list-style:none;
+  background:color-mix(in srgb,var(--surface) 70%,var(--salt));border:1px solid color-mix(in srgb,var(--brand) 22%,transparent);
+  border-radius:var(--r-sm);box-shadow:var(--shadow-lg)}
+.fs-menu button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:9px 10px;border:0;background:none;border-radius:var(--r-sm);white-space:nowrap;font-weight:600;cursor:pointer}
+.fs-menu button:hover{background:color-mix(in srgb,var(--brand) 12%,transparent)}
+.fs-menu button.on{color:var(--brand)}

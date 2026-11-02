@@ -1,0 +1,43 @@
+/* shadcn/ui semantic tokens mapped onto the Swiggy palette from base.css.
+   They reference base.css variables, so light/dark themes follow automatically. */
+:root{
+  --background:var(--paper);
+  --foreground:var(--ink);
+  --card:var(--surface);
+  --card-foreground:var(--ink);
+  --popover:var(--surface);
+  --popover-foreground:var(--ink);
+  --primary:var(--brand);
+  --primary-foreground:#FFF4EC;
+  --secondary:var(--sunk);
+  --secondary-foreground:var(--ink);
+  --muted-foreground:var(--muted);
+  --accent:var(--salt);
+  --accent-foreground:var(--brand);
+  --destructive:var(--loss);
+  --border:var(--line-soft);
+  --input:var(--line);
+  --ring:var(--brand);
+  /* Sidebar: Swiggy-orange gradient with white text (same in light and dark mode). */
+  --sidebar:#FF5200;
+  --sidebar-foreground:rgba(255,244,236,.92);
+  --sidebar-primary:#FFF4EC;
+  --sidebar-primary-foreground:var(--brand);
+  --sidebar-accent:rgba(255,244,236,.22);
+  --sidebar-accent-foreground:#FFF4EC;
+  --sidebar-border:transparent;
+  --sidebar-ring:#FFF4EC;
+}
+[data-sidebar="sidebar"]{
+  background-image:linear-gradient(180deg,#FF5200 0%,#FF6A13 55%,#FF8A2B 100%);
+}
+
+/* Page "flow": the active menu item's white→peach gradient continues into the page.
+   The page's left edge starts at the same peach (#FFD6C0) and fades to the normal page colour. */
+:root{ --flow-1:#FFD6C0; --flow-2:#FFE6D8; --flow-3:#FFF3EC; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --flow-1:#5A2D18; --flow-2:#33211A; --flow-3:#241A16; }
+}
+[data-slot="sidebar-inset"]{
+  background-image:linear-gradient(90deg,var(--flow-1) 0%,var(--flow-2) 35%,var(--flow-3) 100%);
+}
