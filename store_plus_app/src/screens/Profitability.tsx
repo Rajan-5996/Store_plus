@@ -1,12 +1,13 @@
-import { RiCheckboxCircleLine, RiFundsLine, RiMoneyRupeeCircleLine, RiPieChart2Line } from '@remixicon/react'
-import AgentActions from '../components/ui/AgentActions'
+import { RiCheckboxCircleLine, RiArrowRightDownLine, RiMoneyRupeeCircleLine, RiPieChart2Line } from '@remixicon/react'
+import AiInsights from '../components/insights/AiInsights'
 import Box from '../components/ui/Box'
 import KeyValue from '../components/ui/KeyValue'
 import KpiGrid from '../components/ui/KpiGrid'
 import ScreenData from '../components/ui/ScreenData'
 import ScreenHeader from '../components/ui/ScreenHeader'
 import { ScoreBars } from '../components/ui/ScoreBar'
-import { fmt, pct, rupee, rupeeShort } from '../lib/format'
+import StoreLink from '../components/ui/StoreLink'
+import { fmt, frac, pct, rupee, rupeeShort } from '../lib/format'
 import type { ProfitabilityData } from '../types/api'
 
 function ProfitabilityBody({ d }: { d: ProfitabilityData }) {
@@ -14,16 +15,30 @@ function ProfitabilityBody({ d }: { d: ProfitabilityData }) {
   return (
     <>
       <KpiGrid
-        icons={[RiCheckboxCircleLine, RiFundsLine, RiMoneyRupeeCircleLine, RiPieChart2Line]}
+        icons={[RiCheckboxCircleLine, RiArrowRightDownLine, RiMoneyRupeeCircleLine, RiPieChart2Line]}
         items={[
-          { label: 'Stores above break-even', value: `${kpis.aboveBreakEven} / ${kpis.totalStores}` },
-          { label: 'Network daily loss', value: rupeeShort(Math.abs(kpis.dailyNetworkLoss)), tone: 'loss' },
-          { label: 'Average contribution/order', value: rupee(kpis.contributionPerOrder) },
-          { label: 'Highest cost driver', value: kpis.topCostDrivers.join(' + '), valueStyle: { fontSize: 22 } },
+          {
+            label: 'Stores above break-even',
+            value: (
+              <>
+                {kpis.aboveBreakEven}
+                <span className="unit">of {kpis.totalStores}</span>
+              </>
+            ),
+            delta: `${frac(kpis.aboveBreakEven / (kpis.totalStores || 1))} of the network`,
+          },
+          { label: 'Network daily loss', value: rupeeShort(Math.abs(kpis.dailyNetworkLoss)), tone: 'loss', delta: 'From loss-making stores only' },
+          { label: 'Average contribution/order', value: rupee(kpis.contributionPerOrder), delta: 'Before fixed store costs' },
+          { label: 'Highest cost driver', value: kpis.topCostDrivers.join(' + '), valueStyle: { fontSize: 22 }, delta: 'Largest fixed operating costs' },
         ]}
       />
+      <AiInsights scope="profitability" title="Moves that close the profit gap" />
       <div className="grid g2 mt">
-        <Box title={s ? `Store ${s.code} ${s.area}: unit economics` : 'Unit economics'}>
+        <Box
+          title={s ? `Unit economics: ${s.code} ${s.area}` : 'Unit economics'}
+          sub="The store with the lowest daily profit in the current filter."
+          actions={s && <StoreLink code={s.code}>Open store</StoreLink>}
+        >
           {s && (
             <KeyValue
               rows={[
@@ -37,12 +52,12 @@ function ProfitabilityBody({ d }: { d: ProfitabilityData }) {
             />
           )}
         </Box>
-        <Box title="Network cost breakdown">
+        <Box title="Network cost breakdown" sub="Share of fixed operating cost across all stores in the filter.">
           <ScoreBars rows={d.costBreakdown.map((c) => ({ label: c.label, pct: c.pct, value: pct(c.pct) }))} />
+          <p className="mt-4 text-[12.5px] text-muted">
+            {d.costBreakdown.map((c) => `${c.label} ${rupeeShort(c.perDay)}/day`).join(' · ')}
+          </p>
         </Box>
-      </div>
-      <div className="mt">
-        <AgentActions scope="profitability" />
       </div>
     </>
   )

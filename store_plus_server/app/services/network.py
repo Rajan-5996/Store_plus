@@ -1,3 +1,5 @@
+import math
+
 from app.core.db import query
 from app.core.filters import Filters
 from app.services.common import store_metrics
@@ -6,12 +8,14 @@ OVERLAP_PAIR_MIN = 0.15  # share of the smaller store's hexes that the other sto
 POCKET_MIN_SESSIONS = 3000  # unserviceable app sessions/day around one store for it to count as a pocket
 NEAR_BREAKEVEN = 1500  # |daily P&L| under this (INR) is "near break-even"
 AFFLUENT = 4.2  # mean affluence index of a pocket (scale ~3.5-4.5) above which it is a new-store candidate
+RIVAL_KM = 3  # a rival dark store within this distance competes for the same customers (as get_competitor_pressure)
 
 
 def network(f: Filters) -> dict:
     stores = store_metrics(f)
     pairs = _overlap_pairs(f)
     pockets = _pockets(f)
+    rivals = _rivals(f)
     return {
         "kpis": {
             "stores": len(stores),
@@ -19,20 +23,50 @@ def network(f: Filters) -> dict:
             "underservedPockets": len(pockets),
             "expansionCandidates": sum(1 for p in pockets if p["affluence"] >= AFFLUENT),
         },
-        "warehouses": [_warehouse(s) for s in stores],
+        "warehouses": [_warehouse(s, rivals) for s in stores],
+        "competitors": [_competitor(c, stores, f) for c in rivals],
         "scorecard": _scorecard(pairs, pockets),
     }
 
 
-def _warehouse(s: dict) -> dict:
+def _warehouse(s: dict, rivals: list[dict]) -> dict:
     pnl = s["pnl_day"]
     status = "profit" if pnl > NEAR_BREAKEVEN else "mid" if pnl > -NEAR_BREAKEVEN else "loss"
     note = "Healthy, strong demand" if status == "profit" else "Near break-even" if status == "mid" else f"Weak: {s['cause'].lower()}"
+    near = [{"id": c["id"], "brand": c["brand"], "km": round(_km(s, c), 1)} for c in rivals if c["city_code"] == s["city_code"]]
     return {
         "id": s["code"], "name": s["area"], "city": s["city"], "cityCode": s["city_code"],
         "lng": s["lng"], "lat": s["lat"], "status": status, "orders": round(s["orders_day"]),
         "pnlDay": pnl, "note": note,
+        "rivals": sorted((r for r in near if r["km"] <= RIVAL_KM), key=lambda r: r["km"]),
     }
+
+
+def _rivals(f: Filters) -> list[dict]:
+    """Competitor dark stores open by the end of the window, in the selected city."""
+    return query(f"""
+      select c.competitor_store_id as id, coalesce(nullif(c.brand, ''), 'Other') as brand,
+        c.latitude as lat, c.longitude as lng, c.open_date, d.city_code
+      from dim_competitor_store c join dim_city d using (city_id)
+      where c.open_date <= date '{f.end}'
+        and {('c.city_id = ' + str(f.city_id)) if f.city_id is not None else 'true'}
+      order by c.competitor_store_id""")
+
+
+def _competitor(c: dict, stores: list[dict], f: Filters) -> dict:
+    near = min((s for s in stores if s["city_code"] == c["city_code"]), key=lambda s: _km(s, c), default=None)
+    return {
+        "id": c["id"], "brand": c["brand"], "cityCode": c["city_code"], "lng": c["lng"], "lat": c["lat"],
+        "opened": c["open_date"].isoformat(), "isNew": c["open_date"] >= f.start,
+        "near": None if near is None else {"id": near["code"], "name": near["area"], "km": round(_km(near, c), 1)},
+    }
+
+
+def _km(a: dict, b: dict) -> float:
+    """Great-circle distance in km between two points with lat/lng keys."""
+    la, lb = math.radians(a["lat"]), math.radians(b["lat"])
+    h = math.sin((lb - la) / 2) ** 2 + math.cos(la) * math.cos(lb) * math.sin(math.radians(b["lng"] - a["lng"]) / 2) ** 2
+    return 6371 * 2 * math.asin(math.sqrt(h))
 
 
 def _overlap_pairs(f: Filters) -> list[dict]:

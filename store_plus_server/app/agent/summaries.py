@@ -1,4 +1,5 @@
 """The dashboard's own numbers, compacted for the model: identical to what each screen shows."""
+from collections import Counter
 from typing import Any
 
 from app.core.filters import get_filters
@@ -49,6 +50,9 @@ def _compact(screen: str, d: dict) -> dict:
     elif screen == "network":
         ws = sorted(d.pop("warehouses"), key=lambda w: w["pnlDay"])
         d["worstStores"], d["bestStores"] = ws[:6], ws[-4:]
+        rivals = d.pop("competitors")
+        d["rivalStoresByBrand"] = dict(Counter(c["brand"] for c in rivals).most_common())
+        d["rivalOpeningsInPeriod"] = [{"brand": c["brand"], "opened": c["opened"], "near": c["near"]} for c in rivals if c["isNew"]]
     return d
 
 

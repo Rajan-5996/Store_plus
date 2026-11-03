@@ -12,7 +12,7 @@ export default function KpiGrid({ items, icons, cols = 4 }: Props) {
   return (
     <div className={`grid g${cols}`}>
       {items.map((k, i) => (
-        <Kpi key={i} accent={i} icon={icons?.[i]} {...k} />
+        <Kpi key={i} icon={icons?.[i]} {...k} />
       ))}
     </div>
   )

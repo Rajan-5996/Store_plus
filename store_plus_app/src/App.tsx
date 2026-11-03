@@ -1,9 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import AppSidebar from './components/layout/Sidebar'
 import Topbar from './components/layout/Topbar'
-import AskDrawer from './components/layout/AskDrawer'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { useScrollToTop } from '@/hooks/useScrollToTop'
 import Overview from './screens/Overview'
 import Utilisation from './screens/Utilisation'
 import Inventory from './screens/Inventory'
@@ -13,8 +13,10 @@ import Network from './screens/Network'
 import ProductMix from './screens/ProductMix'
 import StoreDetail from './screens/StoreDetail'
 import Transfers from './screens/Transfers'
+import Pulse from './screens/Pulse'
 
 export default function App() {
+  useScrollToTop()
   return (
     <TooltipProvider>
       <SidebarProvider>
@@ -32,11 +34,11 @@ export default function App() {
               <Route path="/productmix" element={<ProductMix />} />
               <Route path="/store/:code" element={<StoreDetail />} />
               <Route path="/transfers" element={<Transfers />} />
+              <Route path="/pulse" element={<Pulse />} />
               <Route path="*" element={<Navigate to="/overview" replace />} />
             </Routes>
           </div>
         </SidebarInset>
-        <AskDrawer />
       </SidebarProvider>
     </TooltipProvider>
   )

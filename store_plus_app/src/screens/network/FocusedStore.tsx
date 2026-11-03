@@ -6,16 +6,18 @@ import { setFocus } from '@/features/filters/filtersSlice'
 import { useActions } from '@/hooks/useActions'
 import type { Warehouse } from '@/data/warehouses'
 import ActionsList, { RefreshButton, isLoading } from '../../components/ui/ActionsList'
+import AiBadge from '../../components/ui/AiBadge'
 import Box from '../../components/ui/Box'
 import Pill from '../../components/ui/Pill'
 import StoreLink from '../../components/ui/StoreLink'
 import Emphasis from '../../components/ui/Emphasis'
+import NearbyRivals from './NearbyRivals'
 import RebalanceList from './RebalanceList'
 import ReplenishList from './ReplenishList'
 import StoreStats from './StoreStats'
 import { verdict } from './verdict'
 
-const STATUS = { profit: ['green', 'Profitable'], mid: ['high', 'Near break-even'], loss: ['red', 'Losing money'] } as const
+const STATUS = { profit: ['green', 'Profitable'], mid: ['warn', 'Near break-even'], loss: ['red', 'Losing money'] } as const
 
 /** The selected store: its numbers, the from → to rebalancing moves and the agent's recommended actions. */
 export default function FocusedStore({ w }: { w: Warehouse }) {
@@ -30,9 +32,8 @@ export default function FocusedStore({ w }: { w: Warehouse }) {
     if (!detail) void dispatch(fetchStore({ code, key }))
   }, [dispatch, code, key, detail])
   const d = detail?.data
-  const header = (
-    <span className="flex items-center gap-2">
-      {w.id} · {w.name}
+  const actions = (
+    <>
       <RefreshButton loading={isLoading(entry)} onClick={reload} />
       <button
         type="button"
@@ -43,10 +44,10 @@ export default function FocusedStore({ w }: { w: Warehouse }) {
       >
         <RiCloseLine className="size-4" aria-hidden />
       </button>
-    </span>
+    </>
   )
   return (
-    <Box title={header} className="rec-box fill-col">
+    <Box title={`${w.id} · ${w.name}`} actions={actions} className="rec-box fill-col">
       <div className="fill-scroll">
         <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">
           <Pill variant={variant}>{label}</Pill>
@@ -65,9 +66,12 @@ export default function FocusedStore({ w }: { w: Warehouse }) {
             Loading this store's numbers…
           </p>
         )}
+        <NearbyRivals rivals={w.rivals} />
         <RebalanceList code={code} onPick={(c) => dispatch(setFocus(c))} />
         <ReplenishList code={code} />
-        <h4 className="rec-section mt-5">What to do next</h4>
+        <h4 className="rec-section mt-5 flex items-center gap-2">
+          What to do next <AiBadge />
+        </h4>
         <ActionsList entry={entry} retry={retry} limit={3} />
       </div>
     </Box>

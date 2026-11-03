@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { setFocus } from '@/features/filters/filtersSlice'
 import { selectAllWarehouses } from '@/features/dashboard/selectors'
 import { STATUS_COLORS } from '@/data/warehouses'
+import { RIVAL_KM } from '@/data/competitors'
 import { rupee } from '@/lib/format'
 import { flyToWarehouse } from './flyToWarehouse'
 
@@ -17,7 +18,7 @@ export default function WarehouseMarkers() {
   return (
     <>
       {warehouses.map((w) => (
-        <MapMarker key={w.id} longitude={w.lng} latitude={w.lat} onClick={() => (focus === w.id ? map && flyToWarehouse(map, w) : dispatch(setFocus(w.id)))}>
+        <MapMarker key={w.id} className="z-2" longitude={w.lng} latitude={w.lat} onClick={() => (focus === w.id ? map && flyToWarehouse(map, w) : dispatch(setFocus(w.id)))}>
           <MarkerContent>
             <div
               className={`translate-y-8 cursor-pointer rounded-full px-2 py-0.5 text-[11px] font-extrabold leading-tight text-[#FFF4EC] shadow-md ${focus === w.id ? 'outline-2 outline-offset-2 outline-[#2A2118]' : ''}`}
@@ -38,6 +39,10 @@ export default function WarehouseMarkers() {
               <div className="flex justify-between text-muted-foreground">
                 <span>Daily P&amp;L</span>
                 <b style={{ color: STATUS_COLORS[w.status] }}>{rupee(w.pnlDay)}/day</b>
+              </div>
+              <div className="flex justify-between text-muted-foreground">
+                <span>Competitors within {RIVAL_KM} km</span>
+                <b className="text-foreground">{w.rivals.length}</b>
               </div>
               <div className="text-xs text-muted-foreground">{w.note}</div>
               <Link to={storePath(w.id)} className="inline-block pt-1 text-xs font-bold text-brand hover:underline">

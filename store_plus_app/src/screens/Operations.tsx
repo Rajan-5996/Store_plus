@@ -1,10 +1,10 @@
 import { RiTimeLine, RiTeamLine, RiPauseCircleLine, RiSpeedUpLine } from '@remixicon/react'
 import LineChart from '../components/charts/LineChart'
-import AgentActions from '../components/ui/AgentActions'
+import AiInsights from '../components/insights/AiInsights'
 import Box from '../components/ui/Box'
 import StoreLink from '../components/ui/StoreLink'
 import KpiGrid from '../components/ui/KpiGrid'
-import { Axis } from '../components/ui/Legend'
+import { Axis, Legend, LegendItem } from '../components/ui/Legend'
 import ScreenData from '../components/ui/ScreenData'
 import ScreenHeader from '../components/ui/ScreenHeader'
 import SimpleTable from '../components/ui/SimpleTable'
@@ -22,23 +22,42 @@ function OperationsBody({ d }: { d: OperationsData }) {
       <KpiGrid
         icons={[RiTimeLine, RiTeamLine, RiPauseCircleLine, RiSpeedUpLine]}
         items={[
-          { label: 'Median pick time', value: `${num1(kpis.medianPickMin)} min` },
-          { label: 'Peak queue time', value: `${kpis.peakQueueMin == null ? '–' : kpis.peakQueueMin.toFixed(2)} min`, tone: 'loss' },
-          { label: 'Order pause time/day', value: `${fmt(kpis.pauseMinDay ?? 0)} min` },
-          { label: 'Orders per picker-hour', value: num1(kpis.ordersPerPickerHour) },
+          { label: 'Median pick time', value: <>{num1(kpis.medianPickMin)}<span className="unit">min</span></>, delta: 'Picking start to complete' },
+          {
+            label: 'Peak queue time',
+            value: <>{kpis.peakQueueMin == null ? '–' : kpis.peakQueueMin.toFixed(2)}<span className="unit">min</span></>,
+            tone: 'loss',
+            delta: 'Wait before picking, busiest hour',
+          },
+          { label: 'Order pause time/day', value: <>{fmt(kpis.pauseMinDay ?? 0)}<span className="unit">min</span></>, delta: 'Per store, in busy mode' },
+          { label: 'Orders per picker-hour', value: num1(kpis.ordersPerPickerHour), delta: 'Picking productivity' },
         ]}
       />
-      <div className="grid g21 mt fill-grid">
-        <Box title="Time to pick by hour (minutes)">
-          <LineChart series={[{ v: q.values, c: 'var(--ink)' }]} h={150} min={lo} max={hi} shade={q.peak} />
+      <AiInsights scope="operations" title="Fixes for order throughput" />
+      <Box className="mt" title="Time from order to picked, by hour" sub="Average minutes from order accepted to picking complete, 8 AM to 11 PM.">
+        <LineChart
+          series={[{ v: q.values, c: 'var(--ink)' }]}
+          labels={q.hours.map(hourLabel)}
+          name="Minutes"
+          unit=" min"
+          yAxis
+          h={220}
+          min={lo}
+          max={hi}
+          shade={q.peak}
+        />
+        <div className="pl-8">
           <Axis labels={[tick(0), tick(Math.round(last / 4)), tick(Math.round(last / 2)), tick(Math.round((3 * last) / 4)), tick(last)]} />
-        </Box>
-        <AgentActions scope="operations" fill />
-      </div>
-      <Box className="mt scroll" title="Operational intervention candidates">
+        </div>
+        <Legend>
+          <LegendItem color="#1F6FEB">Minutes to picked</LegendItem>
+          <LegendItem color="color-mix(in srgb,#FF5200 25%,transparent)">Slowest hours</LegendItem>
+        </Legend>
+      </Box>
+      <Box className="mt scroll" title="Operational intervention candidates" sub="Stores with the longest pick queues: what to check, what to try, and how to know it worked.">
         <SimpleTable
           head={['Store', 'Observed issue', 'Evidence needed', 'Potential intervention', 'Measure success by']}
-          rows={d.candidates.map((c) => [<StoreLink code={c.code} />, c.issue, c.evidence, c.intervention, c.measure])}
+          rows={d.candidates.map((c) => [<StoreLink key="s" code={c.code} />, <b key="i">{c.issue}</b>, c.evidence, c.intervention, c.measure])}
         />
       </Box>
     </>

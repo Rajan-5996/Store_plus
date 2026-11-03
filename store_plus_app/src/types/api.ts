@@ -89,11 +89,27 @@ export interface WarehouseApi {
   orders: number
   pnlDay: number
   note: string
+  /** Competitor stores within 3 km, nearest first. */
+  rivals: { id: string; brand: string; km: number }[]
+}
+
+/** A rival dark store (Blinkit, Zepto, …) open by the end of the window, with the nearest of our stores. */
+export interface CompetitorApi {
+  id: string
+  brand: string
+  cityCode: string
+  lng: number
+  lat: number
+  opened: string
+  /** Opened during the selected date range. */
+  isNew: boolean
+  near: { id: string; name: string; km: number } | null
 }
 
 export interface NetworkData {
   kpis: { stores: number; highOverlapPairs: number; underservedPockets: number; expansionCandidates: number }
   warehouses: WarehouseApi[]
+  competitors: CompetitorApi[]
   scorecard: { name: string; demand: string; coverage: string; overlap: string; investment: string; recommendation: string }[]
 }
 
@@ -117,4 +133,6 @@ export type ScreenName = keyof ScreenMap
 export interface FilterOptions {
   cities: { code: string; name: string }[]
   ranges: { key: string; label: string }[]
+  /** First and last day of data in the dataset (ISO dates). */
+  dataRange?: { start: string; end: string }
 }

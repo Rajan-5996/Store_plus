@@ -9,6 +9,8 @@
 @import './styles/components.css' layer(components);
 @import './styles/extras.css' layer(components);
 @import './styles/recommend.css' layer(components);
+@import './styles/insights.css' layer(components);
+@import './styles/pulse.css' layer(components);
 
 @custom-variant dark (&:is(.dark *));
 
@@ -32,6 +34,13 @@
   --color-loss-bg: var(--loss-bg);
   --color-gain: var(--gain);
   --color-gain-bg: var(--gain-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-nav: var(--nav);
+  --color-nav-raised: var(--nav-raised);
+  --color-nav-ink: var(--nav-ink);
+  --color-nav-ink-strong: var(--nav-ink-strong);
+  --color-nav-line: var(--nav-line);
   --font-sans: var(--font);
   --font-heading: var(--font);
   --shadow-card: var(--shadow);
@@ -78,6 +87,10 @@
   ul { list-style: disc; padding-left: 1.25rem; margin: 0 0 .5rem; }
   ol { list-style: decimal; padding-left: 1.25rem; margin: 0 0 .5rem; }
   [data-sidebar] ul, [data-sidebar] ol { list-style: none; padding-left: 0; margin: 0; }
+  /* Store pins sit above competitor pins (z-2 / z-1); an open popup sits above both. */
+  .maplibregl-popup {
+    @apply z-3!;
+  }
   .maplibregl-popup-content {
     @apply bg-transparent! shadow-none! p-0! rounded-none!;
   }

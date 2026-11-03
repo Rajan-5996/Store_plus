@@ -1,40 +1,33 @@
 .note{color:var(--brand);background:var(--salt);border-radius:var(--r-sm);padding:8px 12px;font-size:13.5px;font-weight:600;line-height:1.4;margin-top:12px;max-width:70ch}
 
-/* ai drawer */
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(400px,100%);background:var(--surface);box-shadow:var(--shadow-lg);z-index:20;transform:translateX(105%);transition:transform .25s ease;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
-.drawer.open{transform:none}
-.drawer .msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;margin:12px 0}
-.msg{border:1px solid var(--line-soft);border-radius:var(--radius);padding:12px 14px;font-size:14px}
-.msg.me{align-self:flex-end;background:var(--brand);border-color:var(--brand);color:var(--brand-ink);max-width:85%}
-.msg.md{overflow-wrap:anywhere}
-.msg.md>*:first-child{margin-top:0}.msg.md>*:last-child{margin-bottom:0}
-.msg.md p{margin:.5em 0}.msg.md ul,.msg.md ol{margin:.5em 0;padding-left:1.3em}.msg.md li{margin:.15em 0}
-.msg.md h1,.msg.md h2,.msg.md h3{font-size:14.5px;margin:.8em 0 .3em}
-.msg.md table{display:block;overflow-x:auto;border-collapse:collapse;margin:.6em 0;font-size:12.5px}
-.msg.md th,.msg.md td{border-bottom:1px solid var(--line-soft);padding:4px 8px;text-align:left;white-space:nowrap}
-.msg.md hr{border:0;border-top:1px solid var(--line-soft);margin:.8em 0}.msg.md blockquote{margin:.5em 0;padding-left:10px;border-left:3px solid var(--brand)}.msg.md strong{font-weight:700}
-.msg.md code{background:var(--salt);border-radius:4px;padding:1px 4px;font-size:12.5px}
-.msg.err{border-color:var(--brand);color:var(--brand)}
 .chip:disabled{opacity:.5;cursor:default}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.chip{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;background:var(--surface);cursor:pointer}
-.chip:hover{border-color:var(--brand);color:var(--brand);background:var(--salt)}
-@media (prefers-reduced-motion: reduce){.drawer{transition:none}.module-card{transition:none}}
+.chip{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:600;background:var(--surface);cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+.chip:hover:not(:disabled){border-color:var(--brand);color:var(--brand);background:var(--salt)}
 
-@media (max-width:980px){
-  .g4{grid-template-columns:1fr 1fr}
-  .g3,.g21{grid-template-columns:1fr}
+/* ---------- Responsive ---------- */
+/* the top bar sheds detail as the space beside the sidebar shrinks, so it never pushes the page sideways */
+@media (max-width:1280px){.top .crumbs > span,.top .crumbs > svg{display:none}}
+@media (max-width:1180px){.user-chip .name{display:none}}
+@media (max-width:900px){.top .btn-label{display:none}.top .btn.solid{width:36px;padding:0}}
+@media (max-width:1100px){
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g3,.g21{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:760px){
-  .g2{grid-template-columns:1fr}
-  .page{padding:8px 14px 48px}
-  .top{padding:10px 14px}
+  .g2,.g4{grid-template-columns:minmax(0,1fr)}
+  .page{padding:16px 14px 48px}
+  .top{padding:0 12px;gap:8px}
+  .top .crumbs,.user-chip .name,.top-search .kbd,.top .btn-label{display:none}
+  .top .btn.solid{width:36px;padding:0}
+  .user-chip{padding-left:0;border-left:0}
+  .page-head{align-items:flex-start}
 }
 
 /* A box beside a chart (Recommended actions): it takes the neighbour's height and scrolls inside, never stretching the row. */
-.fill-col{display:flex;flex-direction:column;max-height:460px}
-.fill-col .fill-scroll{min-height:0;flex:1;overflow-y:auto;padding-right:4px}
-@media (min-width:981px){
+.fill-col{display:flex;flex-direction:column;max-height:480px}
+.fill-col .fill-scroll{min-height:0;flex:1;overflow-y:auto;padding-right:4px;margin-right:-4px}
+@media (min-width:1101px){
   .fill-grid{grid-template-rows:minmax(340px,auto)}
   .fill-col{height:0;min-height:100%;max-height:none}
 }

@@ -1,14 +1,18 @@
-/* Swiggy theme — Swiggy Orange #FF5200, Salt #FFEDE3, Gilroy typeface (brand guidelines) */
+/* Swiggy theme — Swiggy Orange #FF5200, Salt #FFEDE3, Gilroy typeface (brand guidelines).
+   Surfaces are calm warm neutrals so the data and the orange accent carry the page; never pure white. */
 :root{
-  --paper:#FFF4ED; --surface:#FFF9F5; --sunk:#FBEADF; --ink:#02060C; --muted:#686B78;
-  --line:#E8CDBD; --line-soft:#F3DFD3; --annot:#FF5200; --annot-bg:#FFEDE3;
-  --loss:#D92D20; --loss-bg:#FDE8E6; --gain:#1BA672; --gain-bg:#E3F6EE;
+  --paper:#F6F3F1; --surface:#FFFDFB; --sunk:#F3EDE9; --ink:#1B1612; --muted:#6B6E7A;
+  --line:#E3D9D2; --line-soft:#EEE6E0; --annot:#FF5200; --annot-bg:#FFEDE3;
+  --loss:#D92D20; --loss-bg:#FDECEA; --gain:#16875F; --gain-bg:#E3F4EC;
+  --warn:#B54708; --warn-bg:#FEF0D7;
   --fill:#F3DFD3; --fill-strong:#F58B55;
-  --brand:#FF5200; --brand-ink:#FFF4EC; --salt:#FFEDE3;
-  --cool:#1F6FEB; --cool-bg:#E4EDFC; --cool-text:#1553C0; /* blue: the complement of Swiggy orange, used to highlight recommendations */
-  --radius:0.875rem; --r-sm:10px;
-  --btn-dark:#24150E; --btn-dark-ink:#FFF4EC; /* contrast button: deep warm charcoal against the orange/peach theme */
-  --shadow:0 2px 12px rgba(2,6,12,.06); --shadow-lg:0 8px 28px rgba(2,6,12,.12);
+  --brand:#FF5200; --brand-hover:#E54A00; --brand-ink:#FFF4EC; --salt:#FFEDE3;
+  --cool:#1F6FEB; --cool-bg:#E6EEFC; --cool-text:#1553C0; /* blue: the complement of Swiggy orange, used to highlight recommendations */
+  /* navigation rail: deep warm charcoal so the orange accent reads as the brand, not as a wash */
+  --nav:#1E1714; --nav-raised:#2A211D; --nav-ink:rgba(255,244,236,.66); --nav-ink-strong:#FFF4EC; --nav-line:rgba(255,244,236,.09);
+  --radius:0.75rem; --r-sm:8px;
+  --btn-dark:#24150E; --btn-dark-ink:#FFF4EC;
+  --shadow:0 1px 2px rgba(27,22,18,.04),0 2px 6px rgba(27,22,18,.04); --shadow-lg:0 16px 40px -12px rgba(27,22,18,.22);
   --font:"Gilroy","Urbanist","Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:light;
   box-sizing:border-box;
@@ -17,25 +21,30 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#0E1014; --surface:#1B1D23; --sunk:#262930; --ink:#F3F4F6; --muted:#9EA1AD;
-    --line:#41444D; --line-soft:#2C2F37; --annot:#FF7A3D; --annot-bg:#3B2318;
+    --paper:#0E1014; --surface:#17191E; --sunk:#22252B; --ink:#F3F4F6; --muted:#9EA1AD;
+    --line:#383B44; --line-soft:#2A2D34; --annot:#FF7A3D; --annot-bg:#3B2318;
     --loss:#FF8A80; --loss-bg:#3A1F1C; --gain:#4FD1A0; --gain-bg:#173226;
-    --fill:#2C2F37; --fill-strong:#C2603A; --salt:#3B2318;
+    --warn:#FDB022; --warn-bg:#3A2A10;
+    --fill:#2C2F37; --fill-strong:#C2603A; --salt:#3B2318; --brand-hover:#FF6A1F;
     --cool:#6FA2FF; --cool-bg:#16233D; --cool-text:#9DBEFF;
+    --nav:#0A0B0E; --nav-raised:#16181D; --nav-line:rgba(255,244,236,.07);
     --btn-dark:#FFE9DC; --btn-dark-ink:#24150E;
-    --shadow:0 2px 12px rgba(0,0,0,.4); --shadow-lg:0 8px 28px rgba(0,0,0,.5);
+    --shadow:0 1px 2px rgba(0,0,0,.4); --shadow-lg:0 16px 40px -12px rgba(0,0,0,.6);
     color-scheme:dark;
   }
 }
 *,*::before,*::after{box-sizing:inherit}
-html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
-body{margin:0;background:var(--paper);color:var(--ink);font:500 15px/1.5 var(--font);
-  -webkit-font-smoothing:antialiased}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:500 14.5px/1.5 var(--font);
+  -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 0}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 a{color:inherit}
+::selection{background:color-mix(in srgb,var(--brand) 22%,transparent)}
 
-/* Hide scrollbars everywhere (scrolling still works) */
-html,body,*{scrollbar-width:none;-ms-overflow-style:none}
-*::-webkit-scrollbar,html::-webkit-scrollbar{display:none;width:0;height:0}
+/* Thin, quiet scrollbars (hidden scrollbars hide the fact that a table or panel scrolls) */
+*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--muted) 35%,transparent) transparent}
+*::-webkit-scrollbar{width:8px;height:8px}
+*::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--muted) 35%,transparent);border-radius:8px}
+*::-webkit-scrollbar-track{background:transparent}

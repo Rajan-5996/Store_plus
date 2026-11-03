@@ -1,61 +1,67 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import SidebarArt from "./SidebarArt"
-import { solutionNav } from '../../data/screens'
+import { NAV_GROUPS, solutionNav } from '../../data/screens'
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  SidebarSeparator,
 } from '@/components/ui/sidebar'
+import SidebarArt from './SidebarArt'
+
+/* Active item: brand-tinted row and orange icon. */
+const ITEM =
+  'relative h-9 rounded-lg px-3 text-nav-ink hover:bg-nav-raised hover:text-nav-ink-strong ' +
+  'data-active:bg-[color-mix(in_srgb,var(--brand)_16%,transparent)] data-active:text-nav-ink-strong data-active:font-semibold data-active:hover:bg-[color-mix(in_srgb,var(--brand)_20%,transparent)] ' +
+  'data-active:[&_svg]:text-brand group-data-[collapsible=icon]:justify-center [&_svg]:size-[18px]'
 
 export default function AppSidebar() {
   const { pathname } = useLocation()
   return (
     <Sidebar collapsible="icon" className="group-data-[side=left]:border-r-0">
       <SidebarArt />
-      <SidebarHeader className="relative z-10 pt-4">
+      <SidebarHeader className="relative z-10 px-3 pt-4 pb-3">
         <div className="flex items-center gap-2.5 px-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-          <img
-            src="/favicon.png"
-            alt="StorePulse AI"
-            className="size-6 shrink-0 rounded-[6px] ring-1 ring-[#FFF4EC]/80 group-data-[collapsible=icon]:size-6"
-          />
-          <span className="truncate text-[15px] font-extrabold leading-none tracking-tight text-[#FFF4EC] group-data-[collapsible=icon]:hidden">
+          <img src="/favicon.png" alt="StorePulse AI" className="size-7 shrink-0 rounded-lg" />
+          <span className="truncate text-[15.5px] font-extrabold leading-none tracking-tight text-nav-ink-strong group-data-[collapsible=icon]:hidden">
             StorePulse AI
           </span>
         </div>
       </SidebarHeader>
-      <SidebarSeparator className="relative z-10 my-2 bg-[#FFF4EC]/35" />
-      <SidebarContent className="relative z-10">
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
-              {solutionNav.map(({ path, label, icon, activeIcon }) => {
-                const active = pathname === `/${path}`
-                const Icon = active ? activeIcon : icon
-                return (
-                  <SidebarMenuItem key={path}>
-                    <SidebarMenuButton
-                      tooltip={label}
-                      isActive={active}
-                      className="h-10 ring-0 focus-visible:ring-0 justify-start rounded-[6px] group-data-[collapsible=icon]:justify-center data-active:bg-linear-to-r data-active:from-(--surface) data-active:to-(--flow-1) data-active:text-brand data-active:hover:text-brand group-data-[state=expanded]:w-[calc(100%+0.5rem)] group-data-[state=expanded]:rounded-l-full group-data-[state=expanded]:rounded-r-none group-data-[state=expanded]:pl-4 [&_svg]:size-[18px]"
-                      render={<NavLink to={`/${path}`} />}
-                    >
-                      <Icon />
-                      <span className="text-[13px] font-semibold group-data-[collapsible=icon]:hidden">{label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <SidebarContent className="relative z-10 px-1">
+        {NAV_GROUPS.map((group) => (
+          <SidebarGroup key={group}>
+            <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-[.08em] text-nav-ink/70">{group}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-0.5">
+                {solutionNav
+                  .filter((n) => n.group === group)
+                  .map(({ path, label, icon, activeIcon }) => {
+                    const active = pathname === `/${path}`
+                    const Icon = active ? activeIcon : icon
+                    return (
+                      <SidebarMenuItem key={path}>
+                        <SidebarMenuButton tooltip={label} isActive={active} className={ITEM} render={<NavLink to={`/${path}`} />}>
+                          <Icon />
+                          <span className="text-[13.5px] group-data-[collapsible=icon]:hidden">{label}</span>
+                          {path === 'pulse' && (
+                            <span className="ml-auto rounded-full bg-brand px-1.5 py-px text-[10px] font-extrabold tracking-wide text-brand-ink group-data-[collapsible=icon]:hidden">
+                              AI
+                            </span>
+                          )}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

@@ -5,15 +5,12 @@ import { HashRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import { store } from './app/store'
-import { UIProvider } from './context/UIContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <HashRouter>
-        <UIProvider>
-          <App />
-        </UIProvider>
+        <App />
       </HashRouter>
     </Provider>
   </StrictMode>,

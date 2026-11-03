@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { detailKey, fetchStore } from '@/features/store/storeSlice'
+import ErrorState from '../components/ui/ErrorState'
+import PageSkeleton from '../components/ui/PageSkeleton'
 import StoreCosts from './store/StoreCosts'
 import StoreCompare from './store/StoreCompare'
 import StoreHeader from './store/StoreHeader'
@@ -30,18 +32,9 @@ export default function StoreDetail() {
       <section>
         <StoreHeader code={code} />
         {entry?.status === 'error' ? (
-          <div className="box mt" role="alert">
-            <h3>Could not load store #{code}</h3>
-            <p>{entry.error}</p>
-            <button type="button" className="mt-2 font-bold text-brand underline" onClick={() => void dispatch(fetchStore({ code, key }))}>
-              Try again
-            </button>
-          </div>
+          <ErrorState title={`Could not load store #${code}`} message={entry.error} onRetry={() => void dispatch(fetchStore({ code, key }))} />
         ) : (
-          <div className="box mt" aria-busy="true">
-            <h3>Loading store #{code}</h3>
-            <p>Reading this store's numbers from the database.</p>
-          </div>
+          <PageSkeleton />
         )}
       </section>
     )

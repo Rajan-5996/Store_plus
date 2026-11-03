@@ -16,9 +16,11 @@ interface ChatState {
   steps: string[]
   /** One id per browser session: the agent keeps the conversation on the server under it. */
   threadId: string
+  /** Dashboard screen the conversation is about ('all' = let the agent pick from the question). */
+  focus: string
 }
 
-const initialState: ChatState = { messages: [], status: 'idle', steps: [], threadId: nanoid() }
+const initialState: ChatState = { messages: [], status: 'idle', steps: [], threadId: nanoid(), focus: 'all' }
 
 interface ChatReply {
   answer: string
@@ -58,6 +60,9 @@ const chatSlice = createSlice({
       s.messages = []
       s.threadId = nanoid() // a new thread forgets the old conversation
     },
+    setChatFocus: (s, a: PayloadAction<string>) => {
+      s.focus = a.payload
+    },
   },
   extraReducers: (b) => {
     b.addCase(sendMessage.pending, (s, a) => {
@@ -78,5 +83,5 @@ const chatSlice = createSlice({
   },
 })
 
-export const { addStep, clearChat } = chatSlice.actions
+export const { addStep, clearChat, setChatFocus } = chatSlice.actions
 export default chatSlice.reducer

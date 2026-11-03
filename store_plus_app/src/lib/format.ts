@@ -20,5 +20,8 @@ export const frac = (n: number, d = 0): string => pct(n * 100, d)
 
 export const num1 = (n: number | null | undefined): string => (n == null ? '–' : n.toFixed(1))
 
+/** ISO date to "31 Oct 2026". */
+export const longDate = (iso: string): string => new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+
 /** 24h hour to "7 PM". */
 export const hourLabel = (h: number): string => `${h % 12 || 12} ${h < 12 ? 'AM' : 'PM'}`

@@ -1,30 +1,25 @@
 import type { ReactNode } from 'react'
+import { useAppDispatch } from '@/app/hooks'
+import { fetchScreen } from '@/features/dashboard/dashboardSlice'
 import { useScreen } from '@/hooks/useScreen'
 import type { ScreenMap, ScreenName } from '@/types/api'
+import ErrorState from './ErrorState'
+import PageSkeleton from './PageSkeleton'
 
 interface Props<K extends ScreenName> {
   name: K
   children: (data: ScreenMap[K]) => ReactNode
 }
 
-/** Loads a screen's data from the backend (via Redux) and renders its content, or a loading / error state. */
+/** Loads a screen's data from the backend (via Redux) and renders its content, or a loading skeleton / error card. */
 export default function ScreenData<K extends ScreenName>({ name, children }: Props<K>) {
+  const dispatch = useAppDispatch()
   const { data, status, error } = useScreen(name)
   if (data) {
-    return <div className={status === 'loading' ? 'opacity-70 transition-opacity' : 'transition-opacity'}>{children(data)}</div>
+    return <div className={status === 'loading' ? 'opacity-60 transition-opacity' : 'transition-opacity'}>{children(data)}</div>
   }
   if (status === 'error') {
-    return (
-      <div className="box" role="alert">
-        <h3>Could not load data</h3>
-        <p>{error}. Make sure the API server is running on port 8000.</p>
-      </div>
-    )
+    return <ErrorState title="Could not load this page" message={error} onRetry={() => void dispatch(fetchScreen(name))} />
   }
-  return (
-    <div className="box" aria-busy="true">
-      <h3>Loading data</h3>
-      <p>Reading the latest numbers from the store database.</p>
-    </div>
-  )
+  return <PageSkeleton />
 }

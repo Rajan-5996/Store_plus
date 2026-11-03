@@ -17,10 +17,7 @@ export default function NetworkInsights() {
 
   const worst = [...cityStores].sort((a, b) => a.pnlDay - b.pnlDay).slice(0, 5)
   return (
-    <Box
-      title="Store recommendations"
-      className="rec-box fill-col"
-    >
+    <Box title="Store recommendations" sub="Pick a store on the map or from the list below." className="rec-box fill-col">
       <div className="fill-scroll">
         <p className="flex items-start gap-2 text-[13px] text-muted">
           <RiCursorLine className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />

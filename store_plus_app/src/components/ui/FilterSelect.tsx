@@ -5,13 +5,16 @@ interface Props {
   label: string
   options: string[]
   defaultValue?: string
+  /** Controlled value: when set, the dropdown always shows it (e.g. a filter held in Redux). */
+  value?: string
   icon?: ComponentType<{ className?: string }>
   onChange?: (value: string) => void
 }
 
 /** Theme-styled dropdown (replaces the native <select>). */
-export default function FilterSelect({ label, options, defaultValue, icon: Icon, onChange }: Props) {
-  const [value, setValue] = useState(defaultValue ?? options[0])
+export default function FilterSelect({ label, options, defaultValue, value: controlled, icon: Icon, onChange }: Props) {
+  const [inner, setValue] = useState(defaultValue ?? options[0])
+  const value = controlled ?? inner
   const [open, setOpen] = useState(false)
 
   const pick = (o: string) => {
