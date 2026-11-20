@@ -130,6 +130,25 @@ export interface ScreenMap {
 }
 export type ScreenName = keyof ScreenMap
 
+/** A saved Pulse conversation in the History menu (`/api/agent/threads`). */
+export interface ChatThreadApi {
+  id: string
+  /** Its first question. */
+  title: string
+  questions: number
+  /** Last activity, ISO with time zone. */
+  updatedAt: string
+}
+
+/** One question and answer of a saved conversation (`/api/agent/threads/{id}`). */
+export interface ChatTurnApi {
+  question: string
+  answer: string
+  tools: string[]
+  screen: string | null
+  createdAt: string
+}
+
 export interface FilterOptions {
   cities: { code: string; name: string }[]
   ranges: { key: string; label: string }[]

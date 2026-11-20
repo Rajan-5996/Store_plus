@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice, nanoid, type PayloadAction } from '@reduxjs/toolkit'
-import { apiStream } from '@/lib/api'
+import { apiGet, apiStream } from '@/lib/api'
+import type { ChatTurnApi } from '@/types/api'
+import { deleteThread } from './historySlice'
 
 export interface ChatMessage {
   id: string
@@ -14,7 +16,7 @@ interface ChatState {
   status: 'idle' | 'loading'
   /** Live progress lines of the question being answered ("Reading the profitability skill", ...). */
   steps: string[]
-  /** One id per browser session: the agent keeps the conversation on the server under it. */
+  /** The open conversation: the server saves its turns under this id (History reopens older ones). */
   threadId: string
   /** Dashboard screen the conversation is about ('all' = let the agent pick from the question). */
   focus: string
@@ -49,6 +51,17 @@ export const sendMessage = createAsyncThunk(
   },
 )
 
+/** Loads a saved conversation and makes it the open one, so the next question carries on from it. */
+export const openThread = createAsyncThunk('chat/open', (id: string) =>
+  apiGet<ChatTurnApi[]>(`/api/agent/threads/${encodeURIComponent(id)}`),
+)
+
+const toMessages = (id: string, turns: ChatTurnApi[]): ChatMessage[] =>
+  turns.flatMap((t, i) => [
+    { id: `${id}-${i}-q`, role: 'user' as const, text: t.question },
+    { id: `${id}-${i}-a`, role: 'assistant' as const, text: t.answer, tools: t.tools },
+  ])
+
 const chatSlice = createSlice({
   name: 'chat',
   initialState,
@@ -79,6 +92,24 @@ const chatSlice = createSlice({
       s.status = 'idle'
       s.steps = []
       s.messages.push({ id: `${a.meta.requestId}-e`, role: 'error', text: a.error.message ?? 'The agent could not answer.' })
+    })
+    b.addCase(openThread.pending, (s, a) => {
+      s.threadId = a.meta.arg
+      s.messages = []
+      s.steps = []
+    })
+    b.addCase(openThread.fulfilled, (s, a) => {
+      if (s.threadId !== a.meta.arg) return // another conversation was opened meanwhile
+      s.messages = [...toMessages(a.meta.arg, a.payload), ...s.messages] // a question asked while it loaded stays last
+    })
+    b.addCase(openThread.rejected, (s, a) => {
+      if (s.threadId !== a.meta.arg) return
+      s.messages.push({ id: `${a.meta.requestId}-e`, role: 'error', text: `Could not load this conversation: ${a.error.message ?? 'server error'}` })
+    })
+    b.addCase(deleteThread.fulfilled, (s, a) => {
+      if (s.threadId !== a.payload) return
+      s.messages = [] // the open conversation was deleted: start a fresh one
+      s.threadId = nanoid()
     })
   },
 })

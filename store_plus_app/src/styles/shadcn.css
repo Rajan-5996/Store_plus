@@ -1,31 +1,35 @@
 /* shadcn/ui semantic tokens mapped onto the Swiggy palette from base.css.
    They reference base.css variables, so light/dark themes follow automatically. */
-:root{
-  --background:var(--paper);
-  --foreground:var(--ink);
-  --card:var(--surface);
-  --card-foreground:var(--ink);
-  --popover:var(--surface);
-  --popover-foreground:var(--ink);
-  --primary:var(--brand);
-  --primary-foreground:#FFF4EC;
-  --secondary:var(--sunk);
-  --secondary-foreground:var(--ink);
-  --muted-foreground:var(--muted);
-  --accent:var(--salt);
-  --accent-foreground:var(--brand);
-  --destructive:var(--loss);
-  --border:var(--line-soft);
-  --input:var(--line);
-  --ring:var(--brand);
+:root {
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--brand);
+  --primary-foreground: #FFF4EC;
+  --secondary: var(--sunk);
+  --secondary-foreground: var(--ink);
+  --muted-foreground: var(--muted);
+  --accent: var(--salt);
+  --accent-foreground: var(--brand);
+  --destructive: var(--loss);
+  --border: var(--line-soft);
+  --input: var(--line);
+  --ring: var(--brand);
   /* Sidebar: deep warm charcoal rail with cream text and a Swiggy-orange active item (same in light and dark mode). */
-  --sidebar:var(--nav);
-  --sidebar-foreground:var(--nav-ink);
-  --sidebar-primary:var(--brand);
-  --sidebar-primary-foreground:#FFF4EC;
-  --sidebar-accent:var(--nav-raised);
-  --sidebar-accent-foreground:var(--nav-ink-strong);
-  --sidebar-border:transparent;
-  --sidebar-ring:var(--brand);
+  --sidebar: var(--nav);
+  --sidebar-foreground: var(--nav-ink);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: #FFF4EC;
+  --sidebar-accent: var(--nav-raised);
+  --sidebar-accent-foreground: var(--nav-ink-strong);
+  --sidebar-border: transparent;
+  --sidebar-ring: var(--brand);
 }
-[data-slot="sidebar-inset"]{background:var(--paper);min-width:0}
+
+[data-slot="sidebar-inset"] {
+  background: var(--paper);
+  min-width: 0
+}

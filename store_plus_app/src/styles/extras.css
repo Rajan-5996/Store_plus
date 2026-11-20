@@ -1,33 +1,143 @@
-.note{color:var(--brand);background:var(--salt);border-radius:var(--r-sm);padding:8px 12px;font-size:13.5px;font-weight:600;line-height:1.4;margin-top:12px;max-width:70ch}
+.note {
+  color: var(--brand);
+  background: var(--salt);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 12px;
+  max-width: 70ch
+}
 
-.chip:disabled{opacity:.5;cursor:default}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.chip{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:600;background:var(--surface);cursor:pointer;transition:border-color .15s,color .15s,background .15s}
-.chip:hover:not(:disabled){border-color:var(--brand);color:var(--brand);background:var(--salt)}
+.chip:disabled {
+  opacity: .5;
+  cursor: default
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px
+}
+
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--brand);
+  background: var(--salt)
+}
 
 /* ---------- Responsive ---------- */
 /* the top bar sheds detail as the space beside the sidebar shrinks, so it never pushes the page sideways */
-@media (max-width:1280px){.top .crumbs > span,.top .crumbs > svg{display:none}}
-@media (max-width:1180px){.user-chip .name{display:none}}
-@media (max-width:900px){.top .btn-label{display:none}.top .btn.solid{width:36px;padding:0}}
-@media (max-width:1100px){
-  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .g3,.g21{grid-template-columns:minmax(0,1fr)}
+@media (max-width:1280px) {
+
+  .top .crumbs>span,
+  .top .crumbs>svg {
+    display: none
+  }
 }
-@media (max-width:760px){
-  .g2,.g4{grid-template-columns:minmax(0,1fr)}
-  .page{padding:16px 14px 48px}
-  .top{padding:0 12px;gap:8px}
-  .top .crumbs,.user-chip .name,.top-search .kbd,.top .btn-label{display:none}
-  .top .btn.solid{width:36px;padding:0}
-  .user-chip{padding-left:0;border-left:0}
-  .page-head{align-items:flex-start}
+
+@media (max-width:1180px) {
+  .user-chip .name {
+    display: none
+  }
+}
+
+@media (max-width:900px) {
+  .top .btn-label {
+    display: none
+  }
+
+  .top .btn.solid {
+    width: 36px;
+    padding: 0
+  }
+}
+
+@media (max-width:1100px) {
+  .g4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+  }
+
+  .g3,
+  .g21 {
+    grid-template-columns: minmax(0, 1fr)
+  }
+}
+
+@media (max-width:760px) {
+
+  .g2,
+  .g4 {
+    grid-template-columns: minmax(0, 1fr)
+  }
+
+  .page {
+    padding: 16px 14px 48px
+  }
+
+  .top {
+    padding: 0 12px;
+    gap: 8px
+  }
+
+  .top .crumbs,
+  .user-chip .name,
+  .top-search .kbd,
+  .top .btn-label {
+    display: none
+  }
+
+  .top .btn.solid {
+    width: 36px;
+    padding: 0
+  }
+
+  .user-chip {
+    padding-left: 0;
+    border-left: 0
+  }
+
+  .page-head {
+    align-items: flex-start
+  }
 }
 
 /* A box beside a chart (Recommended actions): it takes the neighbour's height and scrolls inside, never stretching the row. */
-.fill-col{display:flex;flex-direction:column;max-height:480px}
-.fill-col .fill-scroll{min-height:0;flex:1;overflow-y:auto;padding-right:4px;margin-right:-4px}
-@media (min-width:1101px){
-  .fill-grid{grid-template-rows:minmax(340px,auto)}
-  .fill-col{height:0;min-height:100%;max-height:none}
+.fill-col {
+  display: flex;
+  flex-direction: column;
+  max-height: 480px
+}
+
+.fill-col .fill-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-right: -4px
+}
+
+@media (min-width:1101px) {
+  .fill-grid {
+    grid-template-rows: minmax(340px, auto)
+  }
+
+  .fill-col {
+    height: 0;
+    min-height: 100%;
+    max-height: none
+  }
 }

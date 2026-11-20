@@ -4,11 +4,12 @@ import FilterSelect from '@/components/ui/FilterSelect'
 import { PULSE_FOCUS } from '@/data/pulse'
 import { solutionNav } from '@/data/screens'
 import { clearChat, setChatFocus } from '@/features/chat/chatSlice'
+import PulseHistory from './PulseHistory'
 
 const ALL = 'All dashboard areas'
 const label = (key: string) => (key === 'all' ? ALL : (solutionNav.find((n) => n.path === key)?.label ?? ALL))
 
-/** Focus area picker and "New conversation": styled for the dark header (`dark`) or the light toolbar. */
+/** Focus area picker, "New conversation" and "History": styled for the dark header (`dark`) or the light toolbar. */
 export default function PulseControls({ dark }: { dark?: boolean }) {
   const dispatch = useAppDispatch()
   const { focus, status, messages } = useAppSelector((s) => s.chat)
@@ -32,6 +33,8 @@ export default function PulseControls({ dark }: { dark?: boolean }) {
       >
         <RiAddLine aria-hidden /> New<span className="wide -ml-1">conversation</span>
       </button>
+      {/* last in the row, so its right-aligned menu always fits on a phone */}
+      <PulseHistory dark={dark} />
     </div>
   )
 }

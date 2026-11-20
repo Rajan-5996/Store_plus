@@ -36,6 +36,11 @@ export function apiPatch<T>(path: string, body: unknown): Promise<T> {
   })
 }
 
+/** DELETE a resource on the FastAPI backend. */
+export function apiDelete<T>(path: string): Promise<T> {
+  return request<T>(path, { method: 'DELETE' })
+}
+
 /** POST and read a server-sent-events stream (`data: {json}` lines), calling `onEvent` for each event as it arrives. */
 export async function apiStream<E>(path: string, body: unknown, onEvent: (event: E) => void): Promise<void> {
   const res = await fetch(`${BASE}${path}`, {

@@ -23,5 +23,17 @@ export const num1 = (n: number | null | undefined): string => (n == null ? '–'
 /** ISO date to "31 Oct 2026". */
 export const longDate = (iso: string): string => new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 
+/** How long ago an ISO time was: "just now", "5 min ago", "3 h ago", "2 days ago", then "12 Nov". */
+export const ago = (iso: string): string => {
+  const min = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
+  if (min < 1) return 'just now'
+  if (min < 60) return `${min} min ago`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `${h} h ago`
+  const d = Math.floor(h / 24)
+  if (d < 7) return `${d} day${d === 1 ? '' : 's'} ago`
+  return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+}
+
 /** 24h hour to "7 PM". */
 export const hourLabel = (h: number): string => `${h % 12 || 12} ${h < 12 ? 'AM' : 'PM'}`

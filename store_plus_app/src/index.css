@@ -11,6 +11,7 @@
 @import './styles/recommend.css' layer(components);
 @import './styles/insights.css' layer(components);
 @import './styles/pulse.css' layer(components);
+@import './styles/pulse-history.css' layer(components);
 
 @custom-variant dark (&:is(.dark *));
 

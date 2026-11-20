@@ -1,0 +1,168 @@
+/* ---------- Pulse AI: "History" menu of saved conversations (PulseHistory, PulseHistoryItem) ---------- */
+.pulse-hist {
+  position: relative
+}
+
+.pulse-hist-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  width: min(360px, calc(100vw - 28px));
+  max-height: min(440px, 60vh);
+  overflow-y: auto;
+  padding: 6px;
+  text-align: left;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg)
+}
+
+.pulse-hist-head {
+  margin: 0;
+  padding: 6px 10px 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--muted)
+}
+
+.pulse-hist-note {
+  margin: 0;
+  padding: 8px 10px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted)
+}
+
+.pulse-hist-note.err {
+  color: var(--loss)
+}
+
+.pulse-hist-menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none
+}
+
+.pulse-hist-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--r-sm)
+}
+
+.pulse-hist-item:hover,
+.pulse-hist-item:focus-within {
+  background: var(--sunk)
+}
+
+.pulse-hist-item.on .pulse-hist-title {
+  color: var(--brand)
+}
+
+.pulse-hist-open {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer
+}
+
+.pulse-hist-title {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 700
+}
+
+.pulse-hist-meta {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted)
+}
+
+/* delete shows on hover or keyboard focus; always on touch screens */
+.pulse-hist-del {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-right: 4px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .15s, color .15s, background .15s
+}
+
+.pulse-hist-item:hover .pulse-hist-del,
+.pulse-hist-item:focus-within .pulse-hist-del {
+  opacity: 1
+}
+
+.pulse-hist-del:hover {
+  color: var(--loss);
+  background: color-mix(in srgb, var(--loss) 10%, transparent)
+}
+
+.pulse-hist-del svg {
+  width: 16px;
+  height: 16px
+}
+
+.pulse-hist-item.confirm {
+  gap: 8px;
+  padding: 6px 6px 6px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--loss) 8%, transparent)
+}
+
+.pulse-hist-item.confirm span {
+  flex: 1
+}
+
+.pulse-hist-act {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer
+}
+
+.pulse-hist-act.danger {
+  border-color: var(--loss);
+  color: var(--loss)
+}
+
+@media (hover: none) {
+  .pulse-hist-del {
+    opacity: 1
+  }
+}
+
+@media (max-width:760px) {
+  .pulse-head .pulse-actions .pulse-hist>.btn {
+    width: 100%
+  }
+}
