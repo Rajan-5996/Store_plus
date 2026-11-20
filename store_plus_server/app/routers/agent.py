@@ -1,6 +1,6 @@
 import json
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Path, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -40,6 +40,29 @@ def actions(screen: str = Query(max_length=32), city: str = Query("all", max_len
         return screen_actions(screen, city, range, refresh)
     except (ActionsError, DomoError) as e:
         raise HTTPException(status_code=404 if "Unknown screen" in str(e) else 502, detail=str(e)) from e
+
+
+@router.get("/threads")
+def threads(limit: int = Query(50, ge=1, le=200)):
+    """Saved conversations for the History menu, most recently active first (title = the first question)."""
+    from app.agent.history import list_threads
+
+    return list_threads(limit)
+
+
+@router.get("/threads/{thread_id}")
+def thread(thread_id: str = Path(max_length=64)):
+    """Every question and answer of one conversation, oldest first; send its id as `thread_id` to carry on with it."""
+    from app.agent.history import thread_turns
+
+    return thread_turns(thread_id)
+
+
+@router.delete("/threads/{thread_id}")
+def forget_thread(thread_id: str = Path(max_length=64)):
+    from app.agent.history import delete_thread
+
+    return {"deleted": delete_thread(thread_id)}
 
 
 @router.post("/chat/stream")

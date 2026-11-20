@@ -42,6 +42,9 @@ def test_engine_answers_in_mock_mode(mock_mode):
     kinds = [e["type"] for e in events]
     assert kinds[0] == "step" and kinds[-1] == "answer"
     assert "Demo mode" in events[-1]["answer"]
+    from app.agent.history import recent_turns
+
+    assert recent_turns("t-mock", 4) == [("How many stores are above break-even?", events[-1]["answer"])]
 
 
 def test_engine_runs_sql_the_model_asks_for(mock_mode):
@@ -136,11 +139,10 @@ def test_rebalance_moves_do_not_double_count(monkeypatch):
     assert rebalance_for("999", f) is None
 
 
-def test_transfer_log_roundtrip(tmp_path, monkeypatch):
+def test_transfer_log_roundtrip():
     from app.services import transfers
 
-    monkeypatch.setattr(transfers, "DB_PATH", tmp_path / "t.db")
-    move = {"kind": "Stock", "item": "Tomato 1 kg", "quantity": 8, "unit": "units", "from_code": "#740", "from_area": "Kondapur",
+    move ={"kind": "Stock", "item": "Tomato 1 kg", "quantity": 8, "unit": "units", "from_code": "#740", "from_area": "Kondapur",
             "to_code": "#744", "to_area": "Kukatpally", "reason": "stock-out"}
     first = transfers.add_transfer(move)
     assert first["status"] == "planned" and first["from"]["code"] == "#740" and first["item"] == "Tomato 1 kg"

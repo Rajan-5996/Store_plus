@@ -7,6 +7,7 @@ uv run uvicorn app.main:app --reload   # http://localhost:8000/docs
 ```
 
 - `app/core` – config, DuckDB connection (`db.py`), store-day / SKU-day marts (`mart.py`), City + date-range filters.
+- `app/core/store.py` – saved app state in `storage/storepulse.duckdb` (git-ignored): the transfer log (`transfers`) and the Pulse AI chat history (`chat_turns`). A separate connection from the analytics one, so the model's SQL cannot read it. DuckDB lets one process write the file, so run a single server process (no `--workers`); the CLI and tests use an in-memory store. An old `storage/transfers.db` (SQLite) is imported once on first start.
 - `app/services` – one module per screen (SQL + metric definitions from `docs/00_StorePulse_Data_Dictionary.xlsx`).
 - `app/routers` – `GET /api/{overview|utilisation|inventory|operations|profitability|network|productmix}?city=all&range=30d` and `GET /api/meta/filters`.
 

@@ -25,7 +25,7 @@ class AgentSettings(BaseSettings):
     max_rounds: int = 3  # data-fetch rounds (SQL requests) the model may ask for per question
     max_context_chars: int = 24000  # data fed to the model per question
     max_rows: int = 60  # rows returned for one SQL request
-    history_turns: int = 4  # earlier question/answer pairs kept per conversation
+    history_turns: int = 4  # earlier question/answer pairs of the conversation fed back to the model (all are saved)
 
     @property
     def use_mock(self) -> bool:

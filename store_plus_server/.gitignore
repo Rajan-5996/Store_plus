@@ -9,5 +9,5 @@ wheels/
 # Virtual environments
 .venv
 .env
-# Local transfer log (SQLite)
+# Saved app state (DuckDB: transfer log, chat history)
 storage/

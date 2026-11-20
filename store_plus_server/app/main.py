@@ -5,13 +5,16 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import CORS_ORIGINS
 from app.core.db import init_db
+from app.core.store import close_store, open_store
 from app.routers import ROUTERS
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     init_db()
+    open_store()  # storage/storepulse.duckdb: transfer log and chat history
     yield
+    close_store()
 
 
 app = FastAPI(title="StorePulse AI Server", lifespan=lifespan)

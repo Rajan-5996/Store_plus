@@ -3,6 +3,7 @@ import sys
 
 from app.agent.engine import ask_stream
 from app.core.db import init_db
+from app.core.store import open_store
 
 
 def main() -> None:
@@ -11,6 +12,7 @@ def main() -> None:
     if not question:
         sys.exit('Usage: uv run python -m app.agent.cli "your question"')
     init_db()
+    open_store(":memory:")  # a one-off question needs no saved history, and the running server may hold the store file
     for e in ask_stream(question):
         if e["type"] == "step":
             print(f"  . {e['text']}")
